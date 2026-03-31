@@ -37,10 +37,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased ${poppins.className} ${manrope.className} bg-[#F7F7F4] text-[#171717] no-select`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased ${poppins.className} ${manrope.className} bg-[#F7F7F4] text-[#171717]`}
       >
         {children}
       </body>
     </html>
   );
 }
+
+
+// no-select

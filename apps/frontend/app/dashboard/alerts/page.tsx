@@ -369,7 +369,7 @@ export default function AlertsPage() {
                                     {alert.evidence && Object.keys(alert.evidence).length > 0 && (
                                         <details className="text-xs">
                                             <summary className="cursor-pointer text-gray-700">Evidence</summary>
-                                            <pre className="mt-2 whitespace-pre-wrap break-words rounded bg-white p-3 text-gray-600 border border-gray-200">
+                                            <pre className="mt-2 whitespace-pre-wrap wrap-break-word rounded bg-white p-3 text-gray-600 border border-gray-200">
                                                 {JSON.stringify(alert.evidence, null, 2)}
                                             </pre>
                                         </details>
