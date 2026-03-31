@@ -1,8 +1,8 @@
 const SOURCE_WEIGHTS = {
     chatgpt: 0.85,
+    claude: 0.85,
     gemini: 0.8,
-    perplexity: 0.9,
-    googleOverview: 0.8,
+    google_aio: 0.8,
     unknown: 0.5
 };
 
@@ -76,7 +76,7 @@ function sentimentScore(sentiment: {
 }
 
 export function computeVisibilityScore(input: {
-    source: "chatgpt" | "gemini" | "perplexity" | "googleOverview" | "unknown";
+    source: "chatgpt" | "claude" | "gemini" | "google_aio" | "unknown";
     text: string;
     prominence: {
         score: number;

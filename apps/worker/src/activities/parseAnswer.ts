@@ -1,13 +1,13 @@
 import { db } from "../db/client";
 import { ruleBasedParser } from "../parser/ruleBasedParser";
 
-function normalizeSource(sourceType: string): "chatgpt" | "gemini" | "perplexity" | "googleOverview" | "unknown" {
+function normalizeSource(sourceType: string): "chatgpt" | "claude" | "gemini" | "google_aio" | "unknown" {
     const source = String(sourceType || "unknown").toLowerCase();
 
     if (source === "chatgpt") return "chatgpt";
+    if (source === "claude") return "claude";
     if (source === "gemini") return "gemini";
-    if (source === "perplexity") return "perplexity";
-    if (source === "googleoverview") return "googleOverview";
+    if (source === "google_aio") return "google_aio";
 
     return "unknown";
 }

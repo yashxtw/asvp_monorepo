@@ -1,7 +1,7 @@
 export type ParserInput = {
     raw_text: string;
     brandNames: string[];
-    source: "chatgpt" | "gemini" | "perplexity" | "googleOverview" | "unknown";
+    source: "chatgpt" | "claude" | "gemini" | "google_aio" | "unknown";
 };
 
 export type ParsedOutput = {

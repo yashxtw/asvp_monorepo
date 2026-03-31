@@ -1,9 +1,8 @@
 export type AISource =
     | "google_aio"
-    | "perplexity"
     | "chatgpt"
-    | "gemini"
-    | "copilot";
+    | "claude"
+    | "gemini";
 
 export interface ConnectorExecuteInput {
     runId: string;
