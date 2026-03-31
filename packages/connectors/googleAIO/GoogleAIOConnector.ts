@@ -18,6 +18,7 @@ type SerpApiGoogleResponse = {
         page_token?: string;
         text_blocks?: unknown[];
         references?: unknown[];
+        error?: string;
     };
     error?: string;
 };
@@ -55,7 +56,7 @@ export class GoogleAIOConnector implements AISourceConnector {
                 debug: {
                     fetchedAt: new Date().toISOString(),
                     executionType: "api",
-                    version: "google_aio_serpapi_v1"
+                    version: "google_aio_serpapi_v2"
                 }
             };
         }
@@ -63,7 +64,8 @@ export class GoogleAIOConnector implements AISourceConnector {
         const googleDomain = process.env.SERPAPI_GOOGLE_DOMAIN || "google.com";
         const hl = process.env.SERPAPI_HL || "en";
         const gl = process.env.SERPAPI_GL || "us";
-        const location = process.env.SERPAPI_LOCATION || "India";
+        const location =
+            process.env.SERPAPI_LOCATION || "Austin, Texas, United States";
 
         try {
             const baseSearch = await this.fetchSerpApi<SerpApiGoogleResponse>({
@@ -80,12 +82,43 @@ export class GoogleAIOConnector implements AISourceConnector {
                 return this.buildErrorOutput(baseSearch.error, start);
             }
 
+            if (baseSearch.ai_overview?.error) {
+                return this.buildErrorOutput(baseSearch.ai_overview.error, start);
+            }
+
+            const embeddedTextBlocks = baseSearch.ai_overview?.text_blocks ?? [];
+            const embeddedReferences = baseSearch.ai_overview?.references ?? [];
+            const embeddedText = this.extractText(embeddedTextBlocks);
+
+            if (embeddedText) {
+                return {
+                    source: this.source,
+                    raw: {
+                        text: embeddedText
+                    },
+                    metadata: {
+                        appeared: true,
+                        position: 1,
+                        container: "serpapi_google_ai_overview_embedded",
+                        model: "google_ai_overview",
+                        latencyMs: Date.now() - start
+                    },
+                    debug: {
+                        fetchedAt: new Date().toISOString(),
+                        executionType: "api",
+                        version: "google_aio_serpapi_v2",
+                        searchId: baseSearch.search_metadata?.id,
+                        referenceCount: embeddedReferences.length,
+                    } as Record<string, unknown> as ConnectorExecuteOutput["debug"]
+                };
+            }
+
             const pageToken = baseSearch.ai_overview?.page_token;
             if (!pageToken) {
                 return {
                     source: this.source,
                     raw: {
-                        text: "Google AI Overview not found"
+                        text: `Google AI Overview not found (location=${location}, hl=${hl}, gl=${gl})`
                     },
                     metadata: {
                         appeared: false,
@@ -97,7 +130,7 @@ export class GoogleAIOConnector implements AISourceConnector {
                     debug: {
                         fetchedAt: new Date().toISOString(),
                         executionType: "api",
-                        version: "google_aio_serpapi_v1"
+                        version: "google_aio_serpapi_v2"
                     }
                 };
             }
@@ -124,14 +157,14 @@ export class GoogleAIOConnector implements AISourceConnector {
                 metadata: {
                     appeared: Boolean(text),
                     position: text ? 1 : 0,
-                    container: "serpapi_google_ai_overview",
+                    container: "serpapi_google_ai_overview_page_token",
                     model: "google_ai_overview",
                     latencyMs: Date.now() - start
                 },
                 debug: {
                     fetchedAt: new Date().toISOString(),
                     executionType: "api",
-                    version: "google_aio_serpapi_v1",
+                    version: "google_aio_serpapi_v2",
                     searchId: baseSearch.search_metadata?.id,
                     pageToken,
                     referenceCount: references.length,
@@ -177,12 +210,8 @@ export class GoogleAIOConnector implements AISourceConnector {
             }
 
             if (typeof value === "object") {
-                for (const [key, nested] of Object.entries(value as Record<string, unknown>)) {
-                    if (key === "snippet" || key === "text" || key === "title") {
-                        walk(nested);
-                    } else {
-                        walk(nested);
-                    }
+                for (const nested of Object.values(value as Record<string, unknown>)) {
+                    walk(nested);
                 }
             }
         };
@@ -208,7 +237,7 @@ export class GoogleAIOConnector implements AISourceConnector {
             debug: {
                 fetchedAt: new Date().toISOString(),
                 executionType: "api",
-                version: "google_aio_serpapi_v1"
+                version: "google_aio_serpapi_v2"
             }
         };
     }
