@@ -362,19 +362,23 @@ router.post("/:id/manual-run", requireAuth, async (req, res) => {
 
     const brandId = queryResult.rows[0].brand_id;
 
-    // Prefer Gemini for zero-cost testing, fallback to ChatGPT
+    // Prefer Google AIO first, then Gemini, then ChatGPT
     const sourceRes = await db.query(
         `
         SELECT id, type
         FROM sources
-        WHERE type IN ('gemini', 'chatgpt')
-        ORDER BY CASE WHEN type = 'gemini' THEN 0 ELSE 1 END
+        WHERE type IN ('google_aio', 'gemini', 'chatgpt')
+        ORDER BY CASE
+            WHEN type = 'google_aio' THEN 0
+            WHEN type = 'gemini' THEN 1
+            ELSE 2
+        END
         LIMIT 1
         `
     );
 
     if (sourceRes.rows.length === 0) {
-        return res.status(500).json({ error: "No source found (gemini/chatgpt)" });
+        return res.status(500).json({ error: "No source found (google_aio/gemini/chatgpt)" });
     }
 
     const sourceId = sourceRes.rows[0].id;
@@ -474,19 +478,23 @@ router.post("/:id/auto-schedule", requireAuth, async (req, res) => {
         });
     }
 
-    // Prefer Gemini for zero-cost testing, fallback to ChatGPT
+    // Prefer Google AIO first, then Gemini, then ChatGPT
     const sourceRes = await db.query(
         `
         SELECT id, type
         FROM sources
-        WHERE type IN ('gemini', 'chatgpt')
-        ORDER BY CASE WHEN type = 'gemini' THEN 0 ELSE 1 END
+        WHERE type IN ('google_aio', 'gemini', 'chatgpt')
+        ORDER BY CASE
+            WHEN type = 'google_aio' THEN 0
+            WHEN type = 'gemini' THEN 1
+            ELSE 2
+        END
         LIMIT 1
         `
     );
 
     if (sourceRes.rows.length === 0) {
-        return res.status(500).json({ error: "No source found (gemini/chatgpt)" });
+        return res.status(500).json({ error: "No source found (google_aio/gemini/chatgpt)" });
     }
 
     const sourceId = sourceRes.rows[0].id;

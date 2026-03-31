@@ -107,7 +107,7 @@ export default function AnalyticsPage() {
                                         <div className="font-medium text-zinc-900">
                                             {answer.main_snippet || "No main snippet"}
                                         </div>
-                                        <div className="mt-1 text-xs text-gray-600 whitespace-pre-wrap break-words line-clamp-4">
+                                        <div className="mt-1 text-xs text-gray-600 whitespace-pre-wrap wrap-break-word line-clamp-4">
                                             {answer.raw_text}
                                         </div>
                                     </td>
