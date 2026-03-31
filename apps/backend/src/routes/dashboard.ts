@@ -177,7 +177,7 @@ router.get("/answers", async (req, res) => {
     try {
         const customerId = req.user?.customer_id;
         const query = `
-        SELECT * FROM answers WHERE customer_id = $1 ORDER BY created_at DESC
+        SELECT * FROM answers WHERE customer_id = $1 ORDER BY created_at DESC LIMIT 10
         `;
         const result = await db.query(query, [customerId]);
         return res.json({ success: true, data: result.rows });

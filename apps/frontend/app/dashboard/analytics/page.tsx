@@ -51,7 +51,7 @@ export default function AnalyticsPage() {
             <div>
                 <h1 className="text-xl font-semibold">Analytics</h1>
                 <p className="text-sm text-gray-600 mt-1">
-                    Parsed answers returned by your AI monitoring runs.
+                    Parsed answers returned by your AI monitoring runs. (last 10)
                 </p>
             </div>
 
