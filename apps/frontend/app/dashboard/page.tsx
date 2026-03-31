@@ -39,7 +39,7 @@ export default function DashboardPage() {
     const [averageProminence, setAverageProminence] = useState<number | null>(null);
     const [averageProminenceposition, setAverageProminencePosition] = useState<string | null>(null);
     const [prominenceTrend, setProminenceTrend] = useState<string | null>(null);
-    const [selectedDateRange, setSelectedDateRange] = useState<"7d" | "30d">("7d");
+    const [selectedDateRange, setSelectedDateRange] = useState<"7d" | "30d">("30d");
 
     useEffect(() => {
         async function loadBrands() {
