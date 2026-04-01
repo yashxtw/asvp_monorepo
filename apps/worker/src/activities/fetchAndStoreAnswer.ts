@@ -7,6 +7,7 @@ export async function fetchAndStoreAnswer(input: {
     sourceId: string;
     customer_id: string;
     brand_id: string;
+    execution_group_id?: string;
 }) {
     // Mark run as running
     await db.query(
@@ -47,11 +48,25 @@ export async function fetchAndStoreAnswer(input: {
         // Store raw answer
         await db.query(
             `
-            INSERT INTO answers (run_id, raw_text, metadata, screenshot_path, html_path, customer_id, brand_id)
-            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            INSERT INTO answers (
+                run_id,
+                query_id,
+                source_id,
+                execution_group_id,
+                raw_text,
+                metadata,
+                screenshot_path,
+                html_path,
+                customer_id,
+                brand_id
+            )
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
             `,
             [
                 input.runId,
+                input.queryId,
+                input.sourceId,
+                input.execution_group_id || input.runId,
                 result.raw_text,
                 result.metadata,
                 result.screenshot_path || null,

@@ -8,6 +8,29 @@ import { syncPlanExpiry } from "../billing/syncPlanExpiry";
 
 const router = Router();
 
+const MULTI_SOURCE_SCHEDULE_KEY = "multi_source";
+const DEFAULT_EXECUTION_SOURCE_TYPES = ["google_aio", "gemini", "chatgpt", "claude"] as const;
+
+async function getExecutionSources() {
+    const result = await db.query(
+        `
+        SELECT id, type
+        FROM sources
+        WHERE type = ANY($1::text[])
+        ORDER BY CASE type
+            WHEN 'google_aio' THEN 0
+            WHEN 'gemini' THEN 1
+            WHEN 'chatgpt' THEN 2
+            WHEN 'claude' THEN 3
+            ELSE 99
+        END
+        `,
+        [DEFAULT_EXECUTION_SOURCE_TYPES]
+    );
+
+    return result.rows as Array<{ id: string; type: string }>;
+}
+
 /**
  * POST /queries
  * body: {
@@ -362,26 +385,11 @@ router.post("/:id/manual-run", requireAuth, async (req, res) => {
 
     const brandId = queryResult.rows[0].brand_id;
 
-    // Prefer Google AIO first, then Gemini, then ChatGPT
-    const sourceRes = await db.query(
-        `
-        SELECT id, type
-        FROM sources
-        WHERE type IN ('google_aio', 'gemini', 'chatgpt')
-        ORDER BY CASE
-            WHEN type = 'google_aio' THEN 0
-            WHEN type = 'gemini' THEN 1
-            ELSE 2
-        END
-        LIMIT 1
-        `
-    );
+    const sources = await getExecutionSources();
 
-    if (sourceRes.rows.length === 0) {
-        return res.status(500).json({ error: "No source found (google_aio/gemini/chatgpt)" });
+    if (sources.length === 0) {
+        return res.status(500).json({ error: "No execution sources found" });
     }
-
-    const sourceId = sourceRes.rows[0].id;
 
     // Start Temporal workflow
     const temporal = await getTemporalClient();
@@ -392,9 +400,10 @@ router.post("/:id/manual-run", requireAuth, async (req, res) => {
         args: [
             {
                 queryId,
-                sourceId,
+                sourceIds: sources.map((source) => source.id),
                 customer_id: req.user!.customer_id,
-                brand_id: brandId
+                brand_id: brandId,
+                trigger_type: "manual"
             },
         ],
     });
@@ -478,28 +487,13 @@ router.post("/:id/auto-schedule", requireAuth, async (req, res) => {
         });
     }
 
-    // Prefer Google AIO first, then Gemini, then ChatGPT
-    const sourceRes = await db.query(
-        `
-        SELECT id, type
-        FROM sources
-        WHERE type IN ('google_aio', 'gemini', 'chatgpt')
-        ORDER BY CASE
-            WHEN type = 'google_aio' THEN 0
-            WHEN type = 'gemini' THEN 1
-            ELSE 2
-        END
-        LIMIT 1
-        `
-    );
+    const sources = await getExecutionSources();
 
-    if (sourceRes.rows.length === 0) {
-        return res.status(500).json({ error: "No source found (google_aio/gemini/chatgpt)" });
+    if (sources.length === 0) {
+        return res.status(500).json({ error: "No execution sources found" });
     }
 
-    const sourceId = sourceRes.rows[0].id;
-
-    const workflowId = `cron-query-${queryId}-${sourceId}`;
+    const workflowId = `cron-query-${queryId}`;
     const temporal = await getTemporalClient();
 
     // Start Temporal cron workflow (idempotent)
@@ -509,7 +503,13 @@ router.post("/:id/auto-schedule", requireAuth, async (req, res) => {
             workflowId,
             cronSchedule: cron,
             workflowExecutionTimeout: "365 days",
-            args: [{ queryId, sourceId, customer_id: req.user!.customer_id, brand_id: brandId }],
+            args: [{
+                queryId,
+                sourceIds: sources.map((source) => source.id),
+                customer_id: req.user!.customer_id,
+                brand_id: brandId,
+                trigger_type: "scheduled"
+            }],
         });
     } catch (err: any) {
         if (err instanceof WorkflowExecutionAlreadyStartedError) {
@@ -532,7 +532,7 @@ router.post("/:id/auto-schedule", requireAuth, async (req, res) => {
             DO UPDATE SET workflow_id = EXCLUDED.workflow_id
             RETURNING id
             `,
-            [queryId, sourceId, workflowId]
+            [queryId, MULTI_SOURCE_SCHEDULE_KEY, workflowId]
         );
 
         const scheduleId = scheduleRes.rows[0].id;
