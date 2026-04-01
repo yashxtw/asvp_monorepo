@@ -28,6 +28,16 @@ type Query = {
     success_runs_7d: number;
     runs_24h: number;
     failed_runs_24h: number;
+    source_breakdown?: Array<{
+        source_type: string;
+        responses: number;
+        brand_mentions: number;
+        visibility: number;
+        prominence: number;
+        sentiment: number;
+        runs: number;
+        last_run: string | null;
+    }>;
 };
 
 export default function NewQueryPage() {
@@ -38,6 +48,7 @@ export default function NewQueryPage() {
     const [queriesLoading, setQueriesLoading] = useState(false);
     const [queryError, setQueryError] = useState<string | null>(null);
     const [filterBrandId, setFilterBrandId] = useState("");
+    const [filterSourceType, setFilterSourceType] = useState("");
     const [bulkActionLoading, setBulkActionLoading] = useState<string | null>(null);
 
     useEffect(() => {
@@ -56,10 +67,17 @@ export default function NewQueryPage() {
 
             try {
                 const url = filterBrandId
-                    ? `${process.env.NEXT_PUBLIC_API_BASE}/queries?brand_id=${filterBrandId}`
-                    : `${process.env.NEXT_PUBLIC_API_BASE}/queries`;
+                    ? new URL(`${process.env.NEXT_PUBLIC_API_BASE}/queries`)
+                    : new URL(`${process.env.NEXT_PUBLIC_API_BASE}/queries`);
 
-                const res = await axios.get(url, { withCredentials: true });
+                if (filterBrandId) {
+                    url.searchParams.set("brand_id", filterBrandId);
+                }
+                if (filterSourceType) {
+                    url.searchParams.set("source_type", filterSourceType);
+                }
+
+                const res = await axios.get(url.toString(), { withCredentials: true });
                 setQueries(res.data?.queries ?? res.data);
             } catch {
                 setQueryError("Failed to load queries");
@@ -69,18 +87,22 @@ export default function NewQueryPage() {
         };
 
         fetchQueries();
-    }, [filterBrandId]);
+    }, [filterBrandId, filterSourceType]);
 
     async function refreshQueries() {
         setQueriesLoading(true);
         setQueryError(null);
 
         try {
-            const url = filterBrandId
-                ? `${process.env.NEXT_PUBLIC_API_BASE}/queries?brand_id=${filterBrandId}`
-                : `${process.env.NEXT_PUBLIC_API_BASE}/queries`;
+            const url = new URL(`${process.env.NEXT_PUBLIC_API_BASE}/queries`);
+            if (filterBrandId) {
+                url.searchParams.set("brand_id", filterBrandId);
+            }
+            if (filterSourceType) {
+                url.searchParams.set("source_type", filterSourceType);
+            }
 
-            const res = await axios.get(url, { withCredentials: true });
+            const res = await axios.get(url.toString(), { withCredentials: true });
             setQueries(res.data?.queries ?? res.data);
         } catch {
             setQueryError("Failed to load queries");
@@ -196,6 +218,8 @@ export default function NewQueryPage() {
                 queryError={queryError}
                 filterBrandId={filterBrandId}
                 onFilterBrandChange={setFilterBrandId}
+                filterSourceType={filterSourceType}
+                onFilterSourceChange={setFilterSourceType}
                 onBulkAction={runBulkAction}
                 bulkActionLoading={bulkActionLoading}
             />

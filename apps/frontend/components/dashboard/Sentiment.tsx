@@ -43,11 +43,13 @@ function formatTrend(current: number, previous: number, hasBaseline: boolean) {
 export default function SentimentDashboard({
     brandId,
     dateRange,
+    source,
     onDominantSentimentChange,
     onSentimentTrendChange,
 }: {
     brandId: string;
     dateRange: "7d" | "30d";
+    source: string;
     onDominantSentimentChange: (label: "positive" | "neutral" | "negative" | null) => void;
     onSentimentTrendChange: (trend: string | null) => void;
 }) {
@@ -58,9 +60,14 @@ export default function SentimentDashboard({
         async function fetchSentiment() {
             try {
                 setLoading(true);
+                const params = new URLSearchParams({
+                    brandId,
+                    range: dateRange,
+                });
+                if (source) params.set("source", source);
 
                 const res = await fetch(
-                    `${process.env.NEXT_PUBLIC_API_BASE}/dashboard/sentiment-overview?brandId=${brandId}&range=${dateRange}`,
+                    `${process.env.NEXT_PUBLIC_API_BASE}/dashboard/sentiment-overview?${params.toString()}`,
                     { credentials: "include" }
                 );
 
@@ -82,7 +89,7 @@ export default function SentimentDashboard({
             onDominantSentimentChange(null);
             onSentimentTrendChange(null);
         }
-    }, [brandId, dateRange, onDominantSentimentChange, onSentimentTrendChange]);
+    }, [brandId, dateRange, source, onDominantSentimentChange, onSentimentTrendChange]);
 
     const metrics = useMemo(() => {
         const currentWindowDays = dateRange === "30d" ? 30 : 7;

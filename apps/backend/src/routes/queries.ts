@@ -78,24 +78,65 @@ router.post("/", requireAuth, async (req, res) => {
 });
 
 /**
- * GET /queries?brand_id=
+ * GET /queries?brand_id=&source_type=
  */
 router.get("/", requireAuth, async (req, res) => {
-    const { brand_id } = req.query;
+    const { brand_id, source_type } = req.query;
     const customerId = req.user!.customer_id;
 
     try {
         const values: any[] = [customerId];
-        let brandFilter = "";
+        const queryFilters: string[] = [
+            "q.customer_id = $1",
+            "q.is_deleted = FALSE"
+        ];
+        const sourceFilters: string[] = [
+            "r.customer_id = $1"
+        ];
+        const answerSourceFilters: string[] = [
+            "a.customer_id = $1"
+        ];
 
         if (brand_id) {
             values.push(brand_id);
-            brandFilter = "AND q.brand_id = $2";
+            queryFilters.push(`q.brand_id = $${values.length}`);
+            sourceFilters.push(`q.brand_id = $${values.length}`);
+            answerSourceFilters.push(`a.brand_id = $${values.length}`);
+        }
+
+        if (source_type && typeof source_type === "string") {
+            values.push(source_type);
+            sourceFilters.push(`s.type = $${values.length}`);
+            answerSourceFilters.push(`s.type = $${values.length}`);
         }
 
         const result = await db.query(
             `
-            WITH run_stats AS (
+            WITH filtered_runs AS (
+                SELECT r.*, s.type AS source_type
+                FROM runs r
+                JOIN queries q ON q.id = r.query_id
+                JOIN sources s ON s.id = r.source_id
+                WHERE ${sourceFilters.join(" AND ")}
+            ),
+            source_breakdown_base AS (
+                SELECT
+                    a.query_id,
+                    s.type AS source_type,
+                    COUNT(a.id) AS responses,
+                    SUM(CASE WHEN a.mentions_brand THEN 1 ELSE 0 END) AS brand_mentions,
+                    COALESCE(ROUND(AVG(a.visibility_score)::numeric, 2), 0) AS visibility,
+                    COALESCE(ROUND(AVG(a.prominence_score)::numeric, 2), 0) AS prominence,
+                    COALESCE(ROUND(AVG(a.sentiment_score)::numeric, 2), 0) AS sentiment,
+                    COUNT(DISTINCT a.run_id) AS runs,
+                    MAX(r.started_at) AS last_run
+                FROM answers a
+                JOIN runs r ON r.id = a.run_id
+                JOIN sources s ON s.id = a.source_id
+                WHERE ${answerSourceFilters.join(" AND ")}
+                GROUP BY a.query_id, s.type
+            ),
+            run_stats AS (
                 SELECT
                     r.query_id,
                     COUNT(*) FILTER (WHERE r.started_at >= now() - interval '7 days') AS runs_7d,
@@ -112,68 +153,77 @@ router.get("/", requireAuth, async (req, res) => {
                         WHERE r.started_at >= now() - interval '24 hours'
                         AND r.status = 'failed'
                     ) AS failed_runs_24h
-                FROM runs r
-                WHERE r.customer_id = $1
+                FROM filtered_runs r
                 GROUP BY r.query_id
+            ),
+            source_breakdown AS (
+                SELECT
+                    sb.query_id,
+                    jsonb_agg(
+                        jsonb_build_object(
+                            'source_type', sb.source_type,
+                            'responses', sb.responses,
+                            'brand_mentions', sb.brand_mentions,
+                            'visibility', sb.visibility,
+                            'prominence', sb.prominence,
+                            'sentiment', sb.sentiment,
+                            'runs', sb.runs,
+                            'last_run', sb.last_run
+                        )
+                        ORDER BY sb.source_type
+                    ) AS source_breakdown
+                FROM source_breakdown_base sb
+                GROUP BY sb.query_id
             )
             SELECT 
-            q.id,
-            q.query_text,
-            q.frequency,
-            q.brand_id,
-            b.brand_name,
-            b.logo_url AS brand_logo,
-            q.query_type,
-            q.created_at,
-            q.is_active,
-            q.is_paused,
-
-            COUNT(a.id) AS responses,
-
-            SUM(CASE WHEN a.mentions_brand THEN 1 ELSE 0 END) AS brand_mentions,
-
-            COALESCE(ROUND(AVG(a.visibility_score)::numeric,2),0) AS visibility,
-            COALESCE(ROUND(AVG(a.prominence_score)::numeric, 2),0) AS prominence,
-            COALESCE(ROUND(AVG(a.sentiment_score)::numeric, 2),0) AS sentiment,
-
-            COUNT(DISTINCT r.id) AS runs,
-
-            MAX(r.started_at) AS last_run,
-
-            COALESCE(rs.runs_7d, 0) AS runs_7d,
-            COALESCE(rs.failed_runs_7d, 0) AS failed_runs_7d,
-            COALESCE(rs.success_runs_7d, 0) AS success_runs_7d,
-            COALESCE(rs.runs_24h, 0) AS runs_24h,
-            COALESCE(rs.failed_runs_24h, 0) AS failed_runs_24h
-
-        FROM queries q
-        JOIN brands b ON q.brand_id = b.id
-        LEFT JOIN runs r ON r.query_id = q.id
-        LEFT JOIN answers a ON a.run_id = r.id AND a.brand_id = q.brand_id
-        LEFT JOIN run_stats rs ON rs.query_id = q.id
-
-        WHERE q.customer_id = $1
-        AND q.is_deleted = FALSE
-        ${brandFilter}
-
-        GROUP BY 
-            q.id,
-            q.query_text,
-            q.frequency,
-            q.brand_id,
-            b.brand_name,
-            b.logo_url,
-            q.query_type,
-            q.created_at,
-            q.is_active,
-            q.is_paused,
-            rs.runs_7d,
-            rs.failed_runs_7d,
-            rs.success_runs_7d,
-            rs.runs_24h,
-            rs.failed_runs_24h
-
-        ORDER BY q.created_at DESC;
+                q.id,
+                q.query_text,
+                q.frequency,
+                q.brand_id,
+                b.brand_name,
+                b.logo_url AS brand_logo,
+                q.query_type,
+                q.created_at,
+                q.is_active,
+                q.is_paused,
+                COUNT(a.id) AS responses,
+                SUM(CASE WHEN a.mentions_brand THEN 1 ELSE 0 END) AS brand_mentions,
+                COALESCE(ROUND(AVG(a.visibility_score)::numeric,2),0) AS visibility,
+                COALESCE(ROUND(AVG(a.prominence_score)::numeric, 2),0) AS prominence,
+                COALESCE(ROUND(AVG(a.sentiment_score)::numeric, 2),0) AS sentiment,
+                COUNT(DISTINCT r.id) AS runs,
+                MAX(r.started_at) AS last_run,
+                COALESCE(rs.runs_7d, 0) AS runs_7d,
+                COALESCE(rs.failed_runs_7d, 0) AS failed_runs_7d,
+                COALESCE(rs.success_runs_7d, 0) AS success_runs_7d,
+                COALESCE(rs.runs_24h, 0) AS runs_24h,
+                COALESCE(rs.failed_runs_24h, 0) AS failed_runs_24h,
+                COALESCE(sb.source_breakdown, '[]'::jsonb) AS source_breakdown
+            FROM queries q
+            JOIN brands b ON q.brand_id = b.id
+            LEFT JOIN filtered_runs r ON r.query_id = q.id
+            LEFT JOIN answers a ON a.run_id = r.id AND a.brand_id = q.brand_id
+            LEFT JOIN run_stats rs ON rs.query_id = q.id
+            LEFT JOIN source_breakdown sb ON sb.query_id = q.id
+            WHERE ${queryFilters.join(" AND ")}
+            GROUP BY 
+                q.id,
+                q.query_text,
+                q.frequency,
+                q.brand_id,
+                b.brand_name,
+                b.logo_url,
+                q.query_type,
+                q.created_at,
+                q.is_active,
+                q.is_paused,
+                rs.runs_7d,
+                rs.failed_runs_7d,
+                rs.success_runs_7d,
+                rs.runs_24h,
+                rs.failed_runs_24h,
+                sb.source_breakdown
+            ORDER BY q.created_at DESC;
             `,
             values
         );

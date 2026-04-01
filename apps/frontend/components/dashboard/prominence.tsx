@@ -47,12 +47,14 @@ function formatTrend(current: number, previous: number, hasBaseline: boolean) {
 export default function ProminenceDashboard({
     brandId,
     dateRange,
+    source,
     onAverageProminence,
     onAveragePosition,
     onProminenceTrendChange,
 }: {
     brandId: string;
     dateRange: "7d" | "30d";
+    source: string;
     onAverageProminence: (avg: number | null) => void;
     onAveragePosition: (avg: string | null) => void;
     onProminenceTrendChange: (trend: string | null) => void;
@@ -65,9 +67,14 @@ export default function ProminenceDashboard({
         async function fetchProminence() {
             try {
                 setLoading(true);
+                const params = new URLSearchParams({
+                    brandId,
+                    range: dateRange,
+                });
+                if (source) params.set("source", source);
 
                 const res = await fetch(
-                    `${process.env.NEXT_PUBLIC_API_BASE}/dashboard/prominenceTrend?brandId=${brandId}&range=${dateRange}`,
+                    `${process.env.NEXT_PUBLIC_API_BASE}/dashboard/prominenceTrend?${params.toString()}`,
                     { credentials: "include" }
                 );
 
@@ -84,7 +91,7 @@ export default function ProminenceDashboard({
         }
 
         if (brandId) fetchProminence();
-    }, [brandId, dateRange]);
+    }, [brandId, dateRange, source]);
 
     const metrics = useMemo(() => {
         const currentWindowDays = dateRange === "30d" ? 30 : 7;

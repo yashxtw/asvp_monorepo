@@ -29,6 +29,16 @@ type Query = {
     sentiment: number;
     runs: number;
     last_run: string | null;
+    source_breakdown?: Array<{
+        source_type: string;
+        responses: number;
+        brand_mentions: number;
+        visibility: number;
+        prominence: number;
+        sentiment: number;
+        runs: number;
+        last_run: string | null;
+    }>;
 };
 
 type Props = {
@@ -38,6 +48,8 @@ type Props = {
     queryError: string | null;
     filterBrandId: string;
     onFilterBrandChange: (brandId: string) => void;
+    filterSourceType: string;
+    onFilterSourceChange: (sourceType: string) => void;
     onBulkAction: (
         action: "run_once" | "delete" | "pause" | "activate" | "unschedule" | "resume",
         queryIds: string[]
@@ -52,6 +64,8 @@ export default function QueryList({
     queryError,
     filterBrandId,
     onFilterBrandChange,
+    filterSourceType,
+    onFilterSourceChange,
     onBulkAction,
     bulkActionLoading,
 }: Props) {
@@ -95,24 +109,38 @@ export default function QueryList({
 
     return (
         <section className="w-full">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center space-x-2">
                     <h2 className="text-lg font-semibold italic pb-2">Queries.</h2>
                     {queriesLoading && <Loading />}
                 </div>
 
-                <select
-                    value={filterBrandId}
-                    onChange={(e) => onFilterBrandChange(e.target.value)}
-                    className="text-sm"
-                >
-                    <option value="">All brands</option>
-                    {brands.map((b) => (
-                        <option key={b.id} value={b.id}>
-                            {b.brand_name}
-                        </option>
-                    ))}
-                </select>
+                <div className="flex items-center gap-2 pb-2">
+                    <select
+                        value={filterBrandId}
+                        onChange={(e) => onFilterBrandChange(e.target.value)}
+                        className="rounded-lg border bg-white px-3 py-2 text-sm"
+                    >
+                        <option value="">All brands</option>
+                        {brands.map((b) => (
+                            <option key={b.id} value={b.id}>
+                                {b.brand_name}
+                            </option>
+                        ))}
+                    </select>
+
+                    <select
+                        value={filterSourceType}
+                        onChange={(e) => onFilterSourceChange(e.target.value)}
+                        className="rounded-lg border bg-white px-3 py-2 text-sm"
+                    >
+                        <option value="">All sources</option>
+                        <option value="google_aio">Google AIO</option>
+                        <option value="gemini">Gemini</option>
+                        <option value="chatgpt">ChatGPT</option>
+                        <option value="claude">Claude</option>
+                    </select>
+                </div>
             </div>
 
             <div className="">
@@ -258,6 +286,33 @@ export default function QueryList({
                                             : "Never"}
                                     </span>
                                 </div>
+
+                                {q.source_breakdown && q.source_breakdown.length > 0 && (
+                                    <div className="mt-3 grid gap-2 md:grid-cols-2 xl:grid-cols-4">
+                                        {q.source_breakdown.map((source) => (
+                                            <div
+                                                key={`${q.id}-${source.source_type}`}
+                                                className="rounded-lg border bg-white px-3 py-2 text-xs text-gray-700"
+                                            >
+                                                <div className="flex items-center justify-between gap-2">
+                                                    <span className="font-medium capitalize">
+                                                        {source.source_type.replace("_", " ")}
+                                                    </span>
+                                                    <span className="text-[11px] text-gray-500">
+                                                        {source.runs} runs
+                                                    </span>
+                                                </div>
+                                                <div className="mt-2 flex flex-wrap gap-2 text-[11px] text-gray-600">
+                                                    <span>Resp: {source.responses}</span>
+                                                    <span>Mentions: {source.brand_mentions}</span>
+                                                    <span>Vis: {source.visibility}</span>
+                                                    <span>Prom: {source.prominence}</span>
+                                                    <span>Sent: {source.sentiment}</span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
 
                         </div>

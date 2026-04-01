@@ -41,11 +41,13 @@ function formatTrend(current: number, previous: number, hasBaseline: boolean) {
 export default function VisibilityOverview({
   brandId,
   dateRange,
+  source,
   onAverageVisibilityChange,
   onVisibilityChange,
 }: {
   brandId: string;
   dateRange: "7d" | "30d";
+  source: string;
   onAverageVisibilityChange: (avg: number | null) => void;
   onVisibilityChange: (change: string | null) => void;
 }) {
@@ -56,8 +58,14 @@ export default function VisibilityOverview({
     async function fetchData() {
       setLoading(true);
       try {
+        const params = new URLSearchParams({
+          brandId,
+          range: dateRange,
+        });
+        if (source) params.set("source", source);
+
         const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_BASE}/dashboard/visibility-overview?brandId=${brandId}&range=${dateRange}`,
+          `${process.env.NEXT_PUBLIC_API_BASE}/dashboard/visibility-overview?${params.toString()}`,
           {
             withCredentials: true,
           }
@@ -71,7 +79,7 @@ export default function VisibilityOverview({
     }
 
     fetchData();
-  }, [brandId, dateRange]);
+  }, [brandId, dateRange, source]);
 
   const metrics = useMemo(() => {
     const sorted = [...data].sort(

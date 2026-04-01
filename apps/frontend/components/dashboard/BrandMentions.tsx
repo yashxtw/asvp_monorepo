@@ -40,6 +40,7 @@ function formatTrend(current: number, previous: number, hasBaseline: boolean) {
 export default function BrandMentionsDashboard({
     brandId,
     dateRange,
+    source,
     onMentionsChange,
     onTotalResponsesChange,
     onMentionRateChange,
@@ -48,6 +49,7 @@ export default function BrandMentionsDashboard({
 }: {
     brandId: string;
     dateRange: "7d" | "30d";
+    source: string;
     onMentionsChange: (mentions: number) => void;
     onTotalResponsesChange: (total: number) => void;
     onMentionRateChange: (rate: number) => void;
@@ -61,9 +63,14 @@ export default function BrandMentionsDashboard({
         async function fetchMentions() {
             try {
                 setLoading(true);
+                const params = new URLSearchParams({
+                    brandId,
+                    range: dateRange,
+                });
+                if (source) params.set("source", source);
 
                 const res = await fetch(
-                    `${process.env.NEXT_PUBLIC_API_BASE}/dashboard/brandMentions?brandId=${brandId}&range=${dateRange}`,
+                    `${process.env.NEXT_PUBLIC_API_BASE}/dashboard/brandMentions?${params.toString()}`,
                     {
                         credentials: "include"
                     }
@@ -79,7 +86,7 @@ export default function BrandMentionsDashboard({
         }
 
         if (brandId) fetchMentions();
-    }, [brandId, dateRange]);
+    }, [brandId, dateRange, source]);
 
     const metrics = useMemo(() => {
         const currentWindowDays = dateRange === "30d" ? 30 : 7;

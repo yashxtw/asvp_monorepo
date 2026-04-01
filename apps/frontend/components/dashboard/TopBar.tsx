@@ -9,10 +9,18 @@ type Brand = {
     name: string
 }
 
+type SourceOption = {
+    value: string
+    label: string
+}
+
 type TopBarProps = {
     brands: Brand[]
     selectedBrandId: string | null
     onSelectBrand: (brandId: string) => void
+    sourceOptions: SourceOption[]
+    selectedSource: string
+    onSelectSource: (source: string) => void
     selectedDateRange: "7d" | "30d"
     onSelectDateRange: (range: "7d" | "30d") => void
     loading: boolean
@@ -23,12 +31,16 @@ export default function TopBar({
     brands,
     selectedBrandId,
     onSelectBrand,
+    sourceOptions,
+    selectedSource,
+    onSelectSource,
     selectedDateRange,
     onSelectDateRange,
     loading,
     brandLoadingError
 }: TopBarProps) {
     const [showBrandDropdown, setShowBrandDropdown] = useState(false)
+    const [showSourceDropdown, setShowSourceDropdown] = useState(false)
     const [showDateDropdown, setShowDateDropdown] = useState(false)
 
     const dateOptions = [
@@ -38,6 +50,8 @@ export default function TopBar({
 
     const selectedBrand =
         brands.find((brand) => brand.id === selectedBrandId) || null
+    const selectedSourceLabel =
+        sourceOptions.find((option) => option.value === selectedSource)?.label || "All sources"
 
     const handleExport = () => {
         const selectedLabel = dateOptions.find((option) => option.value === selectedDateRange)?.label || "Last 7 days"
@@ -80,6 +94,32 @@ export default function TopBar({
 
             {/* RIGHT SIDE */}
             <div className="flex items-center gap-4">
+                <div className="relative">
+                    <button
+                        onClick={() => setShowSourceDropdown(!showSourceDropdown)}
+                        className="flex items-center gap-2 text-sm font-medium transition"
+                    >
+                        {selectedSourceLabel}
+                        <ChevronDown size={16} />
+                    </button>
+
+                    {showSourceDropdown && (
+                        <div className="absolute right-0 mt-2 w-48 bg-white border shadow-lg z-50">
+                            {sourceOptions.map((option) => (
+                                <button
+                                    key={option.value || "all"}
+                                    onClick={() => {
+                                        onSelectSource(option.value)
+                                        setShowSourceDropdown(false)
+                                    }}
+                                    className="w-full text-left px-2 py-1 text-sm hover:bg-gray-100"
+                                >
+                                    {option.label}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </div>
 
                 {/* Date Range */}
                 <div className="relative">
