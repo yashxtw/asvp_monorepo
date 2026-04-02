@@ -1,5 +1,10 @@
 import { Router } from "express";
 import { db } from "../db/client";
+import {
+    buildDashboardCacheKey,
+    getCachedDashboardResponse,
+    setCachedDashboardResponse,
+} from "../lib/dashboardCache";
 
 const router = Router();
 
@@ -32,6 +37,17 @@ router.get("/visibility-overview", async (req, res) => {
             return res.status(400).json({ error: "brandId required" });
         }
 
+        const cacheKey = buildDashboardCacheKey("visibility-overview", {
+            customerId,
+            brandId,
+            range,
+            source,
+        });
+        const cached = await getCachedDashboardResponse<{ success: true; data: unknown[] }>(cacheKey);
+        if (cached) {
+            return res.json(cached);
+        }
+
         const values: unknown[] = [customerId, brandId, fetchDays];
         const filters = [
             "a.customer_id = $1",
@@ -55,7 +71,9 @@ router.get("/visibility-overview", async (req, res) => {
         `;
 
         const result = await db.query(query, values);
-        return res.json({ success: true, data: result.rows });
+        const payload = { success: true as const, data: result.rows };
+        await setCachedDashboardResponse(cacheKey, payload);
+        return res.json(payload);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Internal server error" });
@@ -70,6 +88,17 @@ router.get("/brandMentions", async (req, res) => {
 
         if (!brandId || typeof brandId !== "string") {
             return res.status(400).json({ error: "brandId required" });
+        }
+
+        const cacheKey = buildDashboardCacheKey("brandMentions", {
+            customerId,
+            brandId,
+            range,
+            source,
+        });
+        const cached = await getCachedDashboardResponse<{ success: true; data: unknown[] }>(cacheKey);
+        if (cached) {
+            return res.json(cached);
         }
 
         const values: unknown[] = [customerId, brandId, fetchDays];
@@ -94,7 +123,9 @@ router.get("/brandMentions", async (req, res) => {
         `;
 
         const trend = await db.query(query, values);
-        return res.json({ success: true, data: trend.rows });
+        const payload = { success: true as const, data: trend.rows };
+        await setCachedDashboardResponse(cacheKey, payload);
+        return res.json(payload);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Internal server error" });
@@ -109,6 +140,17 @@ router.get("/sentiment-overview", async (req, res) => {
 
         if (!brandId || typeof brandId !== "string") {
             return res.status(400).json({ error: "brandId required" });
+        }
+
+        const cacheKey = buildDashboardCacheKey("sentiment-overview", {
+            customerId,
+            brandId,
+            range,
+            source,
+        });
+        const cached = await getCachedDashboardResponse<{ success: true; data: unknown[] }>(cacheKey);
+        if (cached) {
+            return res.json(cached);
         }
 
         const values: unknown[] = [customerId, brandId, fetchDays];
@@ -135,7 +177,9 @@ router.get("/sentiment-overview", async (req, res) => {
         `;
 
         const aggregate = await db.query(query, values);
-        return res.json({ success: true, data: aggregate.rows });
+        const payload = { success: true as const, data: aggregate.rows };
+        await setCachedDashboardResponse(cacheKey, payload);
+        return res.json(payload);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Internal server error" });
@@ -150,6 +194,17 @@ router.get("/prominenceTrend", async (req, res) => {
 
         if (!brandId || typeof brandId !== "string") {
             return res.status(400).json({ error: "brandId required" });
+        }
+
+        const cacheKey = buildDashboardCacheKey("prominenceTrend", {
+            customerId,
+            brandId,
+            range,
+            source,
+        });
+        const cached = await getCachedDashboardResponse<{ success: true; data: unknown[] }>(cacheKey);
+        if (cached) {
+            return res.json(cached);
         }
 
         const values: unknown[] = [customerId, brandId, fetchDays];
@@ -174,7 +229,9 @@ router.get("/prominenceTrend", async (req, res) => {
         `;
 
         const result = await db.query(query, values);
-        return res.json({ success: true, data: result.rows });
+        const payload = { success: true as const, data: result.rows };
+        await setCachedDashboardResponse(cacheKey, payload);
+        return res.json(payload);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Internal server error" });
@@ -189,6 +246,17 @@ router.get("/entities", async (req, res) => {
 
         if (!brandId || typeof brandId !== "string") {
             return res.status(400).json({ error: "brandId required" });
+        }
+
+        const cacheKey = buildDashboardCacheKey("entities", {
+            customerId,
+            brandId,
+            range,
+            source,
+        });
+        const cached = await getCachedDashboardResponse<{ success: true; data: unknown[] }>(cacheKey);
+        if (cached) {
+            return res.json(cached);
         }
 
         const values: unknown[] = [customerId, brandId, fetchDays];
@@ -215,7 +283,9 @@ router.get("/entities", async (req, res) => {
         `;
 
         const result = await db.query(query, values);
-        return res.json({ success: true, data: result.rows });
+        const payload = { success: true as const, data: result.rows };
+        await setCachedDashboardResponse(cacheKey, payload);
+        return res.json(payload);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Internal server error" });
@@ -226,6 +296,16 @@ router.get("/answers", async (req, res) => {
     try {
         const { brand_id, source } = req.query;
         const customerId = req.user?.customer_id;
+
+        const cacheKey = buildDashboardCacheKey("answers", {
+            customerId,
+            brand_id,
+            source,
+        });
+        const cached = await getCachedDashboardResponse<{ success: true; data: unknown[] }>(cacheKey);
+        if (cached) {
+            return res.json(cached);
+        }
 
         const values: unknown[] = [customerId];
         const filters = ["a.customer_id = $1"];
@@ -270,11 +350,13 @@ router.get("/answers", async (req, res) => {
         WHERE ${filters.join(" AND ")}
         GROUP BY a.execution_group_id, a.query_id, q.query_text, a.brand_id, b.brand_name
         ORDER BY MAX(a.created_at) DESC
-        LIMIT 25
+        LIMIT 10
         `;
 
         const result = await db.query(query, values);
-        return res.json({ success: true, data: result.rows });
+        const payload = { success: true as const, data: result.rows };
+        await setCachedDashboardResponse(cacheKey, payload);
+        return res.json(payload);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Internal server error" });
