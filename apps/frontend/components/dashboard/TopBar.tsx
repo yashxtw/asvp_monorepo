@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Download, ChevronDown } from "lucide-react"
 import Loading from "@/components/Loading";
 
@@ -42,6 +42,7 @@ export default function TopBar({
     const [showBrandDropdown, setShowBrandDropdown] = useState(false)
     const [showSourceDropdown, setShowSourceDropdown] = useState(false)
     const [showDateDropdown, setShowDateDropdown] = useState(false)
+    const containerRef = useRef<HTMLDivElement | null>(null)
 
     const dateOptions = [
         { label: "Last 7 days", value: "7d" as const },
@@ -58,8 +59,30 @@ export default function TopBar({
         alert(`Exporting data for ${selectedBrand?.name || "Unknown"} (${selectedLabel})`)
     }
 
+    useEffect(() => {
+        function handleOutsideClick(event: MouseEvent) {
+            if (!containerRef.current) {
+                return
+            }
+
+            if (!containerRef.current.contains(event.target as Node)) {
+                setShowBrandDropdown(false)
+                setShowSourceDropdown(false)
+                setShowDateDropdown(false)
+            }
+        }
+
+        document.addEventListener("mousedown", handleOutsideClick)
+        return () => {
+            document.removeEventListener("mousedown", handleOutsideClick)
+        }
+    }, [])
+
     return (
-        <div className="flex items-center justify-between border-b bg-white px-2  py-2">
+        <div
+            ref={containerRef}
+            className="flex items-center justify-between border-b border-zinc-300 bg-white px-2  py-2"
+        >
 
             {/* LEFT - Brand Selector  */}
             <div className="relative flex items-center gap-4">
@@ -75,7 +98,7 @@ export default function TopBar({
                 {brandLoadingError && <span className="text-xs text-red-500">{brandLoadingError}</span>}
 
                 {showBrandDropdown && (
-                    <div className="absolute mt-2 w-48 bg-white border shadow-lg z-50">
+                    <div className="absolute top-5 mt-2 w-48 bg-white border shadow-lg z-50">
                         {brands.map((brand) => (
                             <button
                                 key={brand.id}

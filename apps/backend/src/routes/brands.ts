@@ -1,8 +1,26 @@
 import { Router } from "express";
 import { db } from "../db/client";
 import { requireAuth } from "../middleware/requireAuth";
+import {
+    buildDashboardCacheKey,
+    deleteDashboardCacheKey,
+    getCachedDashboardResponse,
+    setCachedDashboardResponse,
+} from "../lib/dashboardCache";
 
 const router = Router();
+
+function getBrandsDashboardCacheKey(customerId: string) {
+    return buildDashboardCacheKey("brands-list", {
+        customerId,
+    });
+}
+
+function getBrandsInBrandsPageCacheKey(customerId: string) {
+    return buildDashboardCacheKey("brands-list-in-brands-page", {
+        customerId,
+    });
+}
 
 /**
  * POST /brands
@@ -25,6 +43,8 @@ router.post("/", requireAuth, async (req, res) => {
             [req.user!.customer_id, brand_name, canonical_urls, description, logo_url, competitors]
         );
 
+        await deleteDashboardCacheKey(getBrandsDashboardCacheKey(req.user!.customer_id));
+        await deleteDashboardCacheKey(getBrandsInBrandsPageCacheKey(req.user!.customer_id));
         res.status(201).json(result.rows[0]);
     } catch (err: any) {
         if (err.code === "23505") {
@@ -39,6 +59,13 @@ router.post("/", requireAuth, async (req, res) => {
  * GET /brands
  */
 router.get("/", requireAuth, async (req, res) => {
+
+    const cacheKey = getBrandsInBrandsPageCacheKey(req.user!.customer_id);
+    const cached = await getCachedDashboardResponse<any[]>(cacheKey);
+    if (cached) {
+        return res.json(cached);
+    }
+
     const result = await db.query(
         `
                 WITH ranked_runs AS (
@@ -107,6 +134,34 @@ router.get("/", requireAuth, async (req, res) => {
         [req.user!.customer_id]
     );
 
+    await setCachedDashboardResponse(cacheKey, result.rows);
+    res.json(result.rows);
+});
+
+
+/**
+ * GET /brands_for_dashboard
+ */
+router.get("/for_dashboard", requireAuth, async (req, res) => {
+    const cacheKey = getBrandsDashboardCacheKey(req.user!.customer_id);
+
+    const cached = await getCachedDashboardResponse<any[]>(cacheKey);
+    if (cached) {
+        return res.json(cached);
+    }
+
+    const result = await db.query(
+        `
+        SELECT
+            b.id,
+            b.brand_name
+        FROM brands b
+        WHERE b.customer_id = $1
+        `,
+        [req.user!.customer_id]
+    );
+
+    await setCachedDashboardResponse(cacheKey, result.rows);
     res.json(result.rows);
 });
 
@@ -184,6 +239,8 @@ router.patch("/:id", requireAuth, async (req, res) => {
         return res.status(404).json({ error: "Brand not found" });
     }
 
+    await deleteDashboardCacheKey(getBrandsDashboardCacheKey(req.user!.customer_id));
+    await deleteDashboardCacheKey(getBrandsInBrandsPageCacheKey(req.user!.customer_id));
     res.json(result.rows[0]);
 });
 
@@ -206,6 +263,8 @@ router.delete("/:id", requireAuth, async (req, res) => {
         return res.status(404).json({ error: "Brand not found" });
     }
 
+    await deleteDashboardCacheKey(getBrandsDashboardCacheKey(req.user!.customer_id));
+    await deleteDashboardCacheKey(getBrandsInBrandsPageCacheKey(req.user!.customer_id));
     res.json({ deleted: true });
 });
 

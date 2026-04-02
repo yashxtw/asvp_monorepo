@@ -51,6 +51,15 @@ export default function BrandList({
 }: Props) {
 
     const [selectedBrand, setSelectedBrand] = useState<any>(null);
+
+    function formatMetric(value: number | null | undefined, digits = 2) {
+        if (typeof value !== "number" || !Number.isFinite(value)) {
+            return null;
+        }
+
+        return value.toFixed(digits);
+    }
+
     return (
         <section className="space-y-4 w-full">
             <div className="flex items-center space-x-2">
@@ -80,7 +89,7 @@ export default function BrandList({
                         key={brand.id}
                         className="text-sm flex py-1 items-start justify-between"
                     >
-                        <div className="flex items-center gap-2 justify-between bg-gray-100 rounded-lg p-3 w-full">
+                        <div className="flex items-center gap-2 justify-between bg-white border-t border-zinc-300 shadow-sm rounded-lg p-3 w-full">
                             {/* Left Section */}
                             <div className="">
                                 <div className="flex items-center gap-3">
@@ -160,29 +169,29 @@ export default function BrandList({
                                         </>
                                     )}
 
-                                    {brand.avg_visibility !== null && (
+                                    {formatMetric(brand.avg_visibility) !== null && (
                                         <>
                                             <span>|</span>
                                             <span>
-                                                {brand.avg_visibility.toFixed(2)}% visibility
+                                                {formatMetric(brand.avg_visibility)}% visibility
                                             </span>
                                         </>
                                     )}
 
-                                    {brand.avg_sentiment !== null && (
+                                    {formatMetric(brand.avg_sentiment) !== null && (
                                         <>
                                             <span>|</span>
                                             <span>
-                                                {brand.avg_sentiment.toFixed(2)} average sentiment
+                                                {formatMetric(brand.avg_sentiment)} average sentiment
                                             </span>
                                         </>
                                     )}
 
-                                    {brand.mention_rate !== null && (
+                                    {formatMetric(brand.mention_rate) !== null && (
                                         <>
                                             <span>|</span>
                                             <span>
-                                                {brand.mention_rate.toFixed(2)}% mention rate
+                                                {formatMetric(brand.mention_rate)}% mention rate
                                             </span>
                                         </>
                                     )}

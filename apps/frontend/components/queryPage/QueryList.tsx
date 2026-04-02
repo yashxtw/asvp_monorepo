@@ -119,7 +119,7 @@ export default function QueryList({
                     <select
                         value={filterBrandId}
                         onChange={(e) => onFilterBrandChange(e.target.value)}
-                        className="rounded-lg border bg-white px-3 py-2 text-sm"
+                        className="px-3 py-2 text-sm"
                     >
                         <option value="">All brands</option>
                         {brands.map((b) => (
@@ -132,7 +132,7 @@ export default function QueryList({
                     <select
                         value={filterSourceType}
                         onChange={(e) => onFilterSourceChange(e.target.value)}
-                        className="rounded-lg border bg-white px-3 py-2 text-sm"
+                        className="px-3 py-2 text-sm"
                     >
                         <option value="">All sources</option>
                         <option value="google_aio">Google AIO</option>
@@ -146,7 +146,7 @@ export default function QueryList({
             <div className="">
 
                 {queries.length > 0 && (
-                    <div className="mb-3 rounded-lg shadow-md bg-white border border-gray-300 px-3 py-2 text-xs flex flex-wrap items-center gap-2">
+                    <div className="mb-3 rounded-lg shadow-sm bg-white border border-gray-300 px-3 py-2 text-xs flex flex-wrap items-center gap-2">
                         <span className="font-medium">{selectedIds.length} selected</span>
                         <button
                             onClick={() => executeBulkAction("run_once")}
@@ -226,7 +226,7 @@ export default function QueryList({
                         key={q.id}
                         className="py-1 text-sm flex items-start justify-between gap-4"
                     >
-                        <div className="bg-gray-100 w-full p-3 rounded-lg">
+                        <div className="bg-white border-t border-zinc-300 shadow-sm w-full p-3 rounded-lg">
                             <div>
                                 <div className="flex items-center gap-2">
                                     <input
@@ -292,7 +292,7 @@ export default function QueryList({
                                         {q.source_breakdown.map((source) => (
                                             <div
                                                 key={`${q.id}-${source.source_type}`}
-                                                className="rounded-lg border bg-white px-3 py-2 text-xs text-gray-700"
+                                                className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-xs text-gray-700"
                                             >
                                                 <div className="flex items-center justify-between gap-2">
                                                     <span className="font-medium capitalize">

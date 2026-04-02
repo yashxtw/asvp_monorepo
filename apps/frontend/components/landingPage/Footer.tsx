@@ -16,7 +16,7 @@ export default function Footer() {
                     text-zinc-300/40 
                     leading-none 
                     select-none
-                    [mask-image:linear-gradient(to_bottom,black_60%,transparent)]
+                    mask-[linear-gradient(to_bottom,black_60%,transparent)]
                 ">
                     VerityAI
                 </h1>

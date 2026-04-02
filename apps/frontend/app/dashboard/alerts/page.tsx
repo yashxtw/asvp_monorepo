@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import Loading from "@/components/Loading";
+import { RainbowButton } from "@/components/ui/magic/rainbow-button";
+
 
 type AlertRow = {
     id: string;
@@ -96,7 +98,7 @@ function getAlertMeta(alert: AlertRow) {
 
 function KPICard({ title, value }: KPI) {
     return (
-        <div className="bg-gray-100 rounded-2xl p-4 shadow-sm hover:shadow-md transition duration-300 flex flex-col justify-between">
+        <div className="bg-white border-t border-zinc-300 rounded-2xl p-4 shadow-sm hover:shadow-md transition duration-300 flex flex-col justify-between">
             <p className="text-xs font-medium text-zinc-800">{title}</p>
             <div className="mt-3 items-end justify-between">
                 <h2 className="text-3xl font-semibold text-gray-900">{value}</h2>
@@ -270,13 +272,12 @@ export default function AlertsPage() {
                             <option value="google_aio">Google AIO</option>
                         </select>
 
-                        <button
+                        <RainbowButton
                             onClick={runAlertGeneration}
                             disabled={refreshing}
-                            className="px-3 py-1.5 rounded-lg shadow-md border border-zinc-300 text-black hover:bg-black hover:text-white disabled:opacity-50 text-sm"
                         >
                             {refreshing ? "Generating..." : "Run Alert Scan"}
-                        </button>
+                        </RainbowButton>
                     </div>
                 </div>
 
@@ -295,7 +296,7 @@ export default function AlertsPage() {
 
                         return (
                             <div key={alert.id} className="py-1 text-sm flex items-start justify-between gap-4">
-                                <div className="bg-gray-100 w-full p-3 rounded-lg space-y-3">
+                                <div className="bg-white border-t border-zinc-300 shadow-sm w-full p-3 rounded-lg space-y-3">
                                     <div className="flex items-start justify-between gap-4 flex-wrap">
                                         <div>
                                             <div className="flex items-center gap-2 flex-wrap">

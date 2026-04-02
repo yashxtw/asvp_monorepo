@@ -58,7 +58,7 @@ export default function DashboardPage() {
             try {
                 setLoadingBrands(true);
                 const res = await axios.get(
-                    `${process.env.NEXT_PUBLIC_API_BASE}/brands`,
+                    `${process.env.NEXT_PUBLIC_API_BASE}/brands/for_dashboard`,
                     { withCredentials: true }
                 );
                 const data = (Array.isArray(res.data) ? res.data : []) as DashboardBrand[];
@@ -79,7 +79,7 @@ export default function DashboardPage() {
                 setSelectedBrandId(null);
             } finally {
                 setLoadingBrands(false);
-            }    
+            }
         }
 
         loadBrands();
@@ -140,65 +140,61 @@ export default function DashboardPage() {
             />
 
             {selectedBrandId ? (
-                <VisibilityOverview
-                    brandId={selectedBrandId}
-                    dateRange={selectedDateRange}
-                    source={selectedSource}
-                    onAverageVisibilityChange={setAverageVisibility}
-                    onVisibilityChange={setVisibilityChange}
-                />
-            ) : (
-                <div className="rounded-md border px-2 py-1 text-sm bg-blue-50 border-blue-500">
-                    Select a brand to view visibility overview.
-                </div>
-            )}
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {selectedBrandId ? (
-                    <BrandMentionsDashboard
+                <>
+                    <VisibilityOverview
                         brandId={selectedBrandId}
                         dateRange={selectedDateRange}
                         source={selectedSource}
-                        onMentionsChange={setMentions}
-                        onTotalResponsesChange={setTotalResponses}
-                        onMentionRateChange={setMentionRate}
-                        onMentionRateTrendChange={setMentionRateTrend}
-                        onTotalResponsesTrendChange={setTotalResponsesTrend}
+                        onAverageVisibilityChange={setAverageVisibility}
+                        onVisibilityChange={setVisibilityChange}
                     />
-                ) : (
-                    <div className="rounded-md border px-2 py-1 text-sm bg-blue-50 border-blue-500">
-                        Select a brand to view brand mentions.
-                    </div>
-                )}
 
-                {selectedBrandId ? (
-                    <SentimentDashboard 
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <BrandMentionsDashboard
+                            brandId={selectedBrandId}
+                            dateRange={selectedDateRange}
+                            source={selectedSource}
+                            onMentionsChange={setMentions}
+                            onTotalResponsesChange={setTotalResponses}
+                            onMentionRateChange={setMentionRate}
+                            onMentionRateTrendChange={setMentionRateTrend}
+                            onTotalResponsesTrendChange={setTotalResponsesTrend}
+                        />
+
+                        <SentimentDashboard
+                            brandId={selectedBrandId}
+                            dateRange={selectedDateRange}
+                            source={selectedSource}
+                            onDominantSentimentChange={setDominantSentiment}
+                            onSentimentTrendChange={setSentimentTrend}
+                        />
+                    </div>
+
+                    <ProminenceDashboard
                         brandId={selectedBrandId}
                         dateRange={selectedDateRange}
                         source={selectedSource}
-                        onDominantSentimentChange={setDominantSentiment}
-                        onSentimentTrendChange={setSentimentTrend}
+                        onAverageProminence={setAverageProminence}
+                        onAveragePosition={setAverageProminencePosition}
+                        onProminenceTrendChange={setProminenceTrend}
                     />
-                ) : (
-                    <div className="rounded-md border px-2 py-1 text-sm bg-blue-50 border-blue-500">
-                        Select a brand to view sentiment overview.
-                    </div>
-                )}
-            </div>
-
-            {selectedBrandId ? (
-                <ProminenceDashboard 
-                    brandId={selectedBrandId}
-                    dateRange={selectedDateRange}
-                    source={selectedSource}
-                    onAverageProminence={setAverageProminence}
-                    onAveragePosition={setAverageProminencePosition}
-                    onProminenceTrendChange={setProminenceTrend}
-                />
+                </>
             ) : (
-                <div className="rounded-md border px-2 py-1 text-sm bg-blue-50 border-blue-500">
-                    Select a brand to view prominence overview.
+
+                <div className="pointer-events-none flex items-end">
+                    <h1 className="
+                    text-[5vw] 
+                    font-extrabold 
+                    tracking-tight 
+                    text-zinc-300/40 
+                    leading-none 
+                    select-none
+                    mask-[linear-gradient(to_bottom,black_60%,transparent)]
+                ">
+                        Select a brand.
+                    </h1>
                 </div>
+
             )}
         </div>
     );

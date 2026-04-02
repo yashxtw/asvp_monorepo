@@ -6,6 +6,7 @@ import axios from "axios";
 import BrandStats from "@/components/brandsPage/BrandStats";
 import BrandList from "@/components/brandsPage/BrandList";
 import EditBrandModal from "@/components/brandsPage/EditBrandModal";
+import DeleteBrandModal from "@/components/brandsPage/DeleteBrandModal";
 
 type brands = {
   id: string;
@@ -33,7 +34,9 @@ export default function NewBrandPage() {
   const [brandsLoading, setBrandsLoading] = useState(false);
   const [actionLoadingKey, setActionLoadingKey] = useState<string | null>(null);
   const [editingBrand, setEditingBrand] = useState<brands | null>(null);
+  const [deletingBrand, setDeletingBrand] = useState<brands | null>(null);
   const [savingBrand, setSavingBrand] = useState(false);
+  const [deletingBrandLoading, setDeletingBrandLoading] = useState(false);
 
   useEffect(() => {
     setBrandsLoading(true);
@@ -76,16 +79,26 @@ export default function NewBrandPage() {
   }
 
   async function deleteBrand(brandId: string) {
-    const ok = confirm("Delete this brand? This may affect linked queries.");
-    if (!ok) return;
+    const brand = brands.find((b) => b.id === brandId);
+    if (!brand) return;
+
+    setDeletingBrand(brand);
+  }
+
+  async function confirmDeleteBrand() {
+    if (!deletingBrand) return;
 
     try {
-      await axios.delete(`${process.env.NEXT_PUBLIC_API_BASE}/brands/${brandId}`, {
+      setDeletingBrandLoading(true);
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_BASE}/brands/${deletingBrand.id}`, {
         withCredentials: true,
       });
       await refreshBrands();
+      setDeletingBrand(null);
     } catch (err: any) {
       alert(err.response?.data?.error || "Failed to delete brand");
+    } finally {
+      setDeletingBrandLoading(false);
     }
   }
 
@@ -237,6 +250,19 @@ export default function NewBrandPage() {
           saving={savingBrand}
           onClose={() => setEditingBrand(null)}
           onSave={saveBrandEdits}
+        />
+      )}
+
+      {deletingBrand && (
+        <DeleteBrandModal
+          brand={deletingBrand}
+          deleting={deletingBrandLoading}
+          onClose={() => {
+            if (!deletingBrandLoading) {
+              setDeletingBrand(null);
+            }
+          }}
+          onConfirm={confirmDeleteBrand}
         />
       )}
 

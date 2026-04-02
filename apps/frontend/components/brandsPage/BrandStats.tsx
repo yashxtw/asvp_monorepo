@@ -98,7 +98,7 @@ function KPICard({ title, value }: KPI) {
     }, [value, isNumber])
 
     return (
-        <div className="bg-gray-100 rounded-2xl p-4 shadow-sm hover:shadow-md transition duration-300 flex flex-col justify-between">
+        <div className="bg-white border-t border-zinc-300 rounded-2xl p-4 shadow-sm hover:shadow-md transition duration-300 flex flex-col justify-between">
 
 
             <p className="text-xs font-medium text-zinc-800">{title}</p>

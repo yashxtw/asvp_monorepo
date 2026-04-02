@@ -124,7 +124,7 @@ export default function AnalyticsPage() {
         <main className="pt-28 sm:pt-0 space-y-4">
             <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
                 <div>
-                    <h1 className="text-xl font-semibold">Analytics</h1>
+                    <h1 className="text-xl italic font-semibold">Analytics.</h1>
                     <p className="mt-1 text-sm text-gray-600">
                         Compare each query execution side-by-side across Gemini, Claude, ChatGPT, and Google AIO.
                     </p>
@@ -134,7 +134,7 @@ export default function AnalyticsPage() {
                     <select
                         value={selectedBrandId}
                         onChange={(e) => setSelectedBrandId(e.target.value)}
-                        className="rounded-lg border bg-white px-3 py-2 text-sm"
+                        className="px-3 py-2 text-sm"
                     >
                         <option value="">All brands</option>
                         {brands.map((brand) => (
@@ -147,7 +147,7 @@ export default function AnalyticsPage() {
                     <select
                         value={selectedSource}
                         onChange={(e) => setSelectedSource(e.target.value)}
-                        className="rounded-lg border bg-white px-3 py-2 text-sm"
+                        className="px-3 py-2 text-sm"
                     >
                         <option value="">All sources</option>
                         <option value="google_aio">Google AIO</option>
@@ -194,9 +194,9 @@ export default function AnalyticsPage() {
                     {groups.map((group) => (
                         <section
                             key={group.execution_group_id}
-                            className="rounded-2xl border bg-white p-4 shadow-sm"
+                            className="rounded-2xl bg-white border-t border-zinc-300 p-4 shadow-sm"
                         >
-                            <div className="flex flex-col gap-2 border-b pb-3 md:flex-row md:items-start md:justify-between">
+                            <div className="flex flex-col gap-2 border-b border-zinc-300 pb-3 md:flex-row md:items-start md:justify-between">
                                 <div>
                                     <div className="flex flex-wrap items-center gap-2">
                                         <h2 className="text-base font-semibold">{group.query_text}</h2>
@@ -302,7 +302,7 @@ function SummaryCard({
     compact?: boolean;
 }) {
     return (
-        <div className="rounded-2xl bg-gray-100 p-4 shadow-sm">
+        <div className="rounded-2xl bg-white border-t border-zinc-300 p-4 shadow-sm">
             <p className="text-xs font-medium text-zinc-700">{label}</p>
             <p className={`mt-2 font-semibold text-zinc-900 ${compact ? "text-sm leading-5" : "text-3xl"}`}>
                 {value}

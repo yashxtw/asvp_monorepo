@@ -252,7 +252,7 @@ export default function VisibilityOverview({
         </CardContent>
       </Card>
 
-      {metrics.dropPercent > 10 && (
+      {/* {metrics.dropPercent > 10 && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -267,7 +267,7 @@ export default function VisibilityOverview({
             </CardContent>
           </Card>
         </motion.div>
-      )}
+      )} */}
     </div>
   );
 }

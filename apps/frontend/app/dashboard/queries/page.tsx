@@ -53,7 +53,7 @@ export default function NewQueryPage() {
 
     useEffect(() => {
         axios
-            .get(`${process.env.NEXT_PUBLIC_API_BASE}/brands`, {
+            .get(`${process.env.NEXT_PUBLIC_API_BASE}/brands/for_dashboard`, {
                 withCredentials: true,
             })
             .then((res) => setBrands(res.data))

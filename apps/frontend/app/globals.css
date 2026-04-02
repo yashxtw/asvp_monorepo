@@ -5,6 +5,11 @@
   --foreground: #171717;
   --primary: #44413E;
   --textprimary: #171717;
+  --color-1: #ff5f6d;
+  --color-2: #ffc371;
+  --color-3: #47caff;
+  --color-4: #7b61ff;
+  --color-5: #24d39b;
 }
 
 @theme inline {
@@ -117,6 +122,18 @@ body {
   animation: scrollRight 30s linear infinite;
 }
 
+@keyframes rainbow {
+  0% {
+    background-position: 0%;
+  }
+  100% {
+    background-position: 200%;
+  }
+}
+
+.animate-rainbow {
+  animation: rainbow 6s linear infinite;
+}
 
 
 

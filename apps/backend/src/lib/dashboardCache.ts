@@ -16,8 +16,6 @@ export function buildDashboardCacheKey(
         .sort(([a], [b]) => a.localeCompare(b))
         .map(([key, value]) => `${key}:${stablePart(value)}`)
         .join("|");
-        
-    console.log(`Generated cache key for route ${routeName} with params ${JSON.stringify(params)}: dashboard:${routeName}:${serialized}`);    
 
     return `dashboard:${routeName}:${serialized}`;
 }
@@ -49,4 +47,13 @@ export async function setCachedDashboardResponse<T>(key: string, value: T) {
     await redis.set(key, JSON.stringify(value), {
         EX: getDashboardCacheTtlSeconds(),
     });
+}
+
+export async function deleteDashboardCacheKey(key: string) {
+    const redis = await getRedisClient();
+    if (!redis) {
+        return;
+    }
+
+    await redis.del(key);
 }
