@@ -1,20 +1,25 @@
 "use client";
 
-import api from "../lib/axios";
-
 export async function getCurrentUser() {
     try {
-        const res = await api.get("/api/backend/me", {
-        headers: {
-            "Cache-Control": "no-store",
-        },
+        const res = await fetch("/api/backend/me", {
+            method: "GET",
+            credentials: "include",
+            headers: {
+                "Cache-Control": "no-store",
+            },
         });
-        
-        return res.data;
-    } catch (err: any) {
-        if (err.response?.status === 401) {
-        return null;
+
+        if (res.status === 401) {
+            return null;
         }
+
+        if (!res.ok) {
+            throw new Error("Failed to fetch current user");
+        }
+
+        return res.json();
+    } catch (err) {
         throw err;
     }
 }
@@ -24,5 +29,12 @@ export function loginWithGoogle() {
 }
 
 export async function logout() {
-    await api.post("/api/auth/logout");
+    const res = await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+    });
+
+    if (!res.ok) {
+        throw new Error("Failed to log out");
+    }
 }
