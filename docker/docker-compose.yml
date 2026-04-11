@@ -5,6 +5,8 @@ services:
     image: postgres:14
     container_name: asvp_postgres
     restart: unless-stopped
+    profiles:
+      - local-temporal
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -25,6 +27,8 @@ services:
     container_name: asvp_temporal
     image: temporalio/auto-setup:1.23.0
     restart: unless-stopped
+    profiles:
+      - local-temporal
     depends_on:
       - postgres
     environment:
@@ -40,6 +44,8 @@ services:
     image: temporalio/web:latest
     container_name: asvp_temporal_web
     restart: unless-stopped
+    profiles:
+      - local-temporal
     depends_on:
       - temporal
     environment:

@@ -1,3 +1,26 @@
 Starting Dev Environment
-cp .env.example .env
-./scripts/start-dev.sh
+
+1. Copy env:
+`cp .env.example .env`
+
+2. Choose Temporal mode:
+- Primary / recommended: `Temporal Cloud`
+- Optional local fallback:
+  `docker-compose --profile local-temporal --env-file .env -f docker/docker-compose.yml up -d`
+
+3. Optional local Redis only:
+`docker-compose --env-file .env -f docker/docker-compose.yml up -d redis`
+
+4. Start services:
+- `pnpm dev --filter asvp-frontend`
+- `pnpm dev --filter asvp-backend`
+- `pnpm dev --filter asvp-worker`
+- `pnpm dev --filter asvp-llm-service`
+- `pnpm dev --filter asvp-ner-service`
+
+5. Run migrations if needed:
+`pnpm migrate`
+
+Notes
+- Backend and worker now read `TEMPORAL_ADDRESS`, `TEMPORAL_NAMESPACE`, `TEMPORAL_API_KEY`, and `TEMPORAL_TLS`.
+- If you use Temporal Cloud, you do not need local `temporal` or `temporal-web` containers.
