@@ -14,7 +14,7 @@ const items = [
     { name: "Alerts", href: "/dashboard/alerts", icon: Bell },
     { name: "Recommendations", href: "/dashboard/recommendations", icon: Lightbulb },
     { name: "Usage", href: "/dashboard/usage", icon: Gauge },
-    { name: "Settings", href: "/dashboard/settings", icon: Settings },
+    // { name: "Settings", href: "/dashboard/settings", icon: Settings },
     { name: "Account", href: "/dashboard/account", icon: User },
 ];
 

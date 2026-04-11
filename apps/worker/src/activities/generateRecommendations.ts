@@ -1,184 +1,264 @@
 import { db } from "../db/client";
 import { FLAGS } from "../config/flags";
-import { callLLMRecommend } from "../llm/client";
+import { callLLMRecommend, type RecommendationEngineRecord } from "../llm/client";
 
-export async function generateRecommendations(input: {
+function classifyQueryIntent(query: string, queryType?: string | null) {
+    const lower = query.toLowerCase();
+
+    if (lower.includes("best ") || lower.includes("top ")) {
+        return "listicle";
+    }
+
+    if (lower.includes(" vs ") || lower.includes("compare") || queryType === "competitor") {
+        return "comparison";
+    }
+
+    if (
+        lower.startsWith("what is") ||
+        lower.startsWith("how to") ||
+        lower.startsWith("why ") ||
+        queryType === "category"
+    ) {
+        return "informational";
+    }
+
+    if (queryType === "brand") {
+        return "navigational";
+    }
+
+    return "commercial_investigation";
+}
+
+function extractCompetitors(entities: any[] | null | undefined, brandName: string) {
+    if (!Array.isArray(entities)) {
+        return [];
+    }
+
+    const normalizedBrand = brandName.trim().toLowerCase();
+    return [...new Set(
+        entities
+            .map((entity) => String(entity?.canonical_name || entity?.name || "").trim())
+            .filter(Boolean)
+            .filter((name) => name.toLowerCase() !== normalizedBrand)
+    )].slice(0, 6);
+}
+
+function getObservedGap(row: any) {
+    if (!row.mentions_brand && row.competitors_detected.length > 0) {
+        return "Brand is absent while competitors are present in the answer.";
+    }
+
+    if (!row.mentions_brand) {
+        return "Brand is absent from the answer.";
+    }
+
+    if ((row.prominence_score ?? 0) < 0.2) {
+        return "Brand is mentioned but not prominently surfaced in the answer.";
+    }
+
+    if (row.sentiment_label === "negative") {
+        return "Brand is represented with negative sentiment.";
+    }
+
+    return "Brand visibility is weaker than expected for this query.";
+}
+
+async function upsertStructuredRecommendation(input: {
     customerId: string;
+    brandId: string | null;
+    queryId: string | null;
+    sourceId: string | null;
+    sourceType: string;
+    recommendation: RecommendationEngineRecord;
 }) {
-    // Low visibility queries
-    const lowVisibility = await db.query(
+    const dedupeCheck = await db.query(
         `
-        SELECT
-        q.id AS query_id,
-        s.id AS source_id,
-        AVG(
-            CASE WHEN a.mentions_brand THEN a.confidence ELSE 0 END
-        ) AS visibility
-        FROM answers a
-        JOIN runs r ON r.id = a.run_id
-        JOIN queries q ON q.id = r.query_id
-        JOIN sources s ON s.id = r.source_id
-        WHERE q.customer_id = $1
-        GROUP BY q.id, s.id
-        HAVING AVG(
-        CASE WHEN a.mentions_brand THEN a.confidence ELSE 0 END
-        ) < 0.3
-        `,
-        [input.customerId]
-    );
-
-    for (const row of lowVisibility.rows) {
-        await db.query(
-        `
-        INSERT INTO recommendations (
-            customer_id,
-            query_id,
-            source_id,
-            type,
-            priority,
-            message,
-            evidence
-        )
-        VALUES ($1, $2, $3, 'visibility_gap', 'high', $4, $5)
-        `,
-        [
-            input.customerId,
-            row.query_id,
-            row.source_id,
-            "Your brand rarely appears for this query. Add authoritative FAQ/About content targeting this topic.",
-            { visibility: row.visibility }
-        ]
-        );
-    }
-
-    // Recent SoV drop alerts
-    const alerts = await db.query(
-        `
-        SELECT source_id, message
-        FROM alerts
+        SELECT id
+        FROM recommendations
         WHERE customer_id = $1
-        AND alert_type = 'sov_drop'
-        AND created_at >= now() - INTERVAL '2 days'
-        `,
-        [input.customerId]
-    );
-
-    for (const alert of alerts.rows) {
-        await db.query(
-        `
-        INSERT INTO recommendations (
-            customer_id,
-            source_id,
-            type,
-            priority,
-            message,
-            evidence
-        )
-        VALUES ($1, $2, 'sov_loss', 'high', $3, $4)
+          AND query_id IS NOT DISTINCT FROM $2
+          AND source_id IS NOT DISTINCT FROM $3
+          AND root_cause = $4
+          AND type = $5
+          AND resolved_at IS NULL
+        LIMIT 1
         `,
         [
             input.customerId,
-            alert.source_id,
-            "Competitors overtook you in AI answers. Review competitor claims and add missing facts/entities.",
-            { alert: alert.message }
+            input.queryId,
+            input.sourceId,
+            input.recommendation.root_cause,
+            input.recommendation.recommendation_type,
         ]
-        );
-    }
-
-    // Low confidence answers
-    const lowConfidence = await db.query(
-        `
-        SELECT
-        q.id AS query_id,
-        s.id AS source_id,
-        AVG(a.confidence) AS avg_confidence
-        FROM answers a
-        JOIN runs r ON r.id = a.run_id
-        JOIN queries q ON q.id = r.query_id
-        JOIN sources s ON s.id = r.source_id
-        WHERE q.customer_id = $1
-        GROUP BY q.id, s.id
-        HAVING AVG(a.confidence) < 0.5
-        `,
-        [input.customerId]
     );
 
-    for (const row of lowConfidence.rows) {
+    const dbValues = [
+        input.customerId,
+        input.brandId,
+        input.sourceId,
+        input.queryId,
+        input.recommendation.recommendation_type,
+        input.recommendation.priority,
+        input.recommendation.reason,
+        JSON.stringify(input.recommendation.evidence ?? {}),
+        input.recommendation.root_cause,
+        JSON.stringify(input.recommendation.secondary_causes ?? []),
+        input.recommendation.reason,
+        input.recommendation.query_intent,
+        JSON.stringify(input.recommendation.content ?? {}),
+        JSON.stringify(input.recommendation.distribution ?? []),
+        input.recommendation.priority_score,
+        input.recommendation.confidence,
+        input.sourceType,
+    ];
+
+    if (dedupeCheck.rows.length > 0) {
         await db.query(
+            `
+            UPDATE recommendations
+            SET
+                brand_id = $2,
+                priority = $6,
+                message = $7,
+                evidence = $8::jsonb,
+                secondary_causes = $10::jsonb,
+                reason = $11,
+                query_intent = $12,
+                content = $13::jsonb,
+                distribution = $14::jsonb,
+                priority_score = $15,
+                confidence = $16,
+                source_type_snapshot = $17,
+                created_at = now()
+            WHERE id = $1
+            `,
+            [dedupeCheck.rows[0].id, ...dbValues.slice(1)]
+        );
+        return;
+    }
+
+    await db.query(
         `
         INSERT INTO recommendations (
             customer_id,
+            brand_id,
+            source_id,
             query_id,
-            source_id,
             type,
             priority,
             message,
-            evidence
+            evidence,
+            root_cause,
+            secondary_causes,
+            reason,
+            query_intent,
+            content,
+            distribution,
+            priority_score,
+            confidence,
+            source_type_snapshot
         )
-        VALUES ($1, $2, $3, 'low_confidence', 'medium', $4, $5)
+        VALUES (
+            $1, $2, $3, $4, $5, $6, $7, $8::jsonb, $9, $10::jsonb, $11, $12, $13::jsonb, $14::jsonb, $15, $16, $17
+        )
         `,
-        [
-            input.customerId,
-            row.query_id,
-            row.source_id,
-            "AI answers lack confidence. Add structured data, citations, and explicit claims to your content.",
-            { avg_confidence: row.avg_confidence }
-        ]
-        );
-    }
+        dbValues
+    );
+}
 
+export async function generateRecommendations(input: { customerId: string }) {
     if (!FLAGS.ENABLE_LLM_RECOMMENDATIONS) {
         return;
     }
 
-    // Fetch recent alerts to ground LLM prompts
-    const alertsLlm = await db.query(
+    const candidateRows = await db.query(
         `
-        SELECT a.alert_type, a.source_id, a.message, s.type AS source_type
+        SELECT
+            a.id AS alert_id,
+            a.alert_type,
+            a.message AS alert_message,
+            a.evidence AS alert_evidence,
+            a.brand_id,
+            a.query_id,
+            a.source_id,
+            q.query_text,
+            q.query_type,
+            b.brand_name,
+            s.type AS source_type,
+            ans.mentions_brand,
+            ans.visibility_score,
+            ans.sentiment_label,
+            ans.sentiment_score,
+            ans.prominence_score,
+            ans.entities,
+            ans.raw_text
         FROM alerts a
+        LEFT JOIN queries q ON q.id = a.query_id
+        LEFT JOIN brands b ON b.id = a.brand_id
         LEFT JOIN sources s ON s.id = a.source_id
+        LEFT JOIN answers ans ON ans.run_id = a.run_id
         WHERE a.customer_id = $1
-        AND a.created_at >= now() - INTERVAL '2 days'
+          AND a.status IN ('open', 'acknowledged')
+          AND a.alert_type <> 'connector_failure'
+          AND a.last_seen_at >= now() - interval '7 days'
+        ORDER BY
+            CASE a.severity
+                WHEN 'critical' THEN 4
+                WHEN 'high' THEN 3
+                WHEN 'medium' THEN 2
+                ELSE 1
+            END DESC,
+            a.last_seen_at DESC
+        LIMIT 20
         `,
         [input.customerId]
     );
 
-    for (const alert of alertsLlm.rows) {
+    for (const row of candidateRows.rows) {
         try {
-        const llmPayload = {
-            type: alert.alert_type,
-            brand: "DEFAULT_BRAND", // single-tenant MVP; replace later
-            query: "N/A",           // can be enriched later
-            source: alert.source_type || "unknown",
-            signals: {
-            alert_message: alert.message
+            const competitors = extractCompetitors(row.entities, row.brand_name || "");
+            const llmPayload = {
+                query: row.query_text || "Unknown query",
+                query_type: row.query_type || "unknown",
+                query_intent: classifyQueryIntent(row.query_text || "", row.query_type),
+                source_type: row.source_type || "unknown",
+                brand: row.brand_name || "Unknown brand",
+                brand_id: row.brand_id,
+                mentions_brand: Boolean(row.mentions_brand),
+                visibility_score: row.visibility_score ?? null,
+                sentiment_label: row.sentiment_label ?? null,
+                sentiment_score: row.sentiment_score ?? null,
+                prominence_score: row.prominence_score ?? null,
+                entities: Array.isArray(row.entities) ? row.entities : [],
+                competitors_detected: competitors,
+                raw_text: row.raw_text || "",
+                alert_context: {
+                    alert_type: row.alert_type,
+                    alert_message: row.alert_message,
+                    alert_evidence: row.alert_evidence ?? {},
+                    observed_gap: getObservedGap({
+                        mentions_brand: row.mentions_brand,
+                        prominence_score: row.prominence_score,
+                        sentiment_label: row.sentiment_label,
+                        competitors_detected: competitors,
+                    }),
+                },
+            };
+
+            const llmResult = await callLLMRecommend(llmPayload);
+
+            for (const recommendation of llmResult.recommendations ?? []) {
+                await upsertStructuredRecommendation({
+                    customerId: input.customerId,
+                    brandId: row.brand_id ?? null,
+                    queryId: row.query_id ?? null,
+                    sourceId: row.source_id ?? null,
+                    sourceType: row.source_type || "unknown",
+                    recommendation,
+                });
             }
-        };
-
-        const llmResult = await callLLMRecommend(llmPayload);
-
-        await db.query(
-            `
-            INSERT INTO recommendations (
-            customer_id,
-            source_id,
-            type,
-            priority,
-            message,
-            evidence
-            )
-            VALUES ($1, $2, 'llm_recommendation', 'high', $3, $4)
-            `,
-            [
-            input.customerId,
-            alert.source_id,
-            llmResult.recommendation,
-            { llm_confidence: llmResult.confidence }
-            ]
-        );
-        } catch (err) {
-        // IMPORTANT: LLM failure must NOT break pipeline
-        console.error("LLM recommendation failed:", err);
+        } catch (error) {
+            console.error("Structured recommendation generation failed:", error);
         }
     }
 }
