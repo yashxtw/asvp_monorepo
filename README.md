@@ -8,8 +8,9 @@ Starting Dev Environment
 - Optional local fallback:
   `docker-compose --profile local-temporal --env-file .env -f docker/docker-compose.yml up -d`
 
-3. Optional local Redis only:
-`docker-compose --env-file .env -f docker/docker-compose.yml up -d redis`
+3. Configure Redis Cloud:
+- set `REDIS_URL` in `.env`
+- use the full Redis Cloud connection string, usually `rediss://...`
 
 4. Start services:
 - `pnpm dev --filter asvp-frontend`
@@ -24,3 +25,4 @@ Starting Dev Environment
 Notes
 - Backend and worker now read `TEMPORAL_ADDRESS`, `TEMPORAL_NAMESPACE`, `TEMPORAL_API_KEY`, and `TEMPORAL_TLS`.
 - If you use Temporal Cloud, you do not need local `temporal` or `temporal-web` containers.
+- Redis is expected to come from Redis Cloud via `REDIS_URL`.

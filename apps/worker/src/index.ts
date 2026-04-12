@@ -2,7 +2,9 @@ import { NativeConnection, Worker } from "@temporalio/worker";
 import path from "path";
 import dotenv from "dotenv";
 
-dotenv.config();
+dotenv.config({
+    path: path.resolve(__dirname, "../../../.env"),
+});
 
 function parseBooleanEnv(value: string | undefined): boolean | undefined {
     if (value == null || value === "") return undefined;
@@ -27,6 +29,9 @@ function getTemporalWorkerConfig() {
 
 async function run() {
     const temporal = getTemporalWorkerConfig();
+    console.log(
+        `Connecting worker to Temporal namespace ${temporal.namespace} at ${temporal.address} (tls=${temporal.tls ? "on" : "off"})`
+    );
     const connection = await NativeConnection.connect({
         address: temporal.address,
         tls: temporal.tls,

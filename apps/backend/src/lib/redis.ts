@@ -7,18 +7,9 @@ let redisConnectPromise: Promise<AppRedisClient | null> | null = null;
 let redisDisabled = false;
 
 function getRedisConnectionUrl() {
-    if (process.env.REDIS_URL) {
-        return process.env.REDIS_URL;
-    }
-
-    const host = process.env.REDIS_HOST;
-    const port = process.env.REDIS_PORT;
-
-    if (!host || !port) {
-        return null;
-    }
-
-    return `redis://${host}:${port}`;
+    const url = process.env.REDIS_URL?.trim();
+    if (!url) return null;
+    return url;
 }
 
 export async function getRedisClient() {
