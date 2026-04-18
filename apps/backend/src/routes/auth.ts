@@ -13,6 +13,19 @@ dotenv.config({
 
 const router = Router();
 
+function getAuthCookieOptions() {
+    const isSecure =
+        process.env.NODE_ENV === "production" ||
+        process.env.FRONTEND_URL?.startsWith("https://") === true;
+
+    return {
+        httpOnly: true,
+        secure: isSecure,
+        sameSite: (isSecure ? "none" : "lax") as "none" | "lax",
+        path: "/",
+    };
+}
+
 // Start Google OAuth
 router.get(
     "/google",
@@ -31,6 +44,7 @@ router.get(
     async (req, res) => {
         const user = req.user as any;
         const token = signJWT(user);
+        const cookieOptions = getAuthCookieOptions();
 
         const email = user.email;
 
@@ -55,6 +69,10 @@ router.get(
             console.error("Failed to ensure alerts schedule for customer:", error);
         });
 
+        // Important in production: the backend domain must set its own cookie
+        // so cross-site XHR/fetch requests to NEXT_PUBLIC_API_BASE can include it.
+        res.cookie("auth_token", token, cookieOptions);
+
         res.redirect(`${process.env.FRONTEND_URL}/api/auth/callback?token=${token}`);
     }
 );
@@ -74,7 +92,7 @@ router.get("/me", (req, res) => {
 
 // Logout
 router.post("/logout", (_req, res) => {
-    res.clearCookie("auth_token");
+    res.clearCookie("auth_token", getAuthCookieOptions());
     res.json({ success: true });
 });
 

@@ -11,11 +11,14 @@ export async function GET(req: NextRequest) {
         new URL("/dashboard", req.url)
     );
 
-    // Cookie is set by Next.js (same origin)
+    const isSecure = req.nextUrl.protocol === "https:";
+
+    // Frontend keeps its own cookie so Next middleware on the frontend domain
+    // can protect dashboard routes. Backend sets its own cookie separately.
     res.cookies.set("auth_token", token, {
         httpOnly: true,
-        sameSite: "none", // no cross-site , none for cross-site, lax for same-site
-        secure: true,   // localhost: false, production: true
+        sameSite: "lax",
+        secure: isSecure,
         path: "/",
     });
 
