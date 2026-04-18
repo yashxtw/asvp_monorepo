@@ -1,0 +1,13 @@
+.git
+.gitignore
+.turbo
+node_modules
+**/node_modules
+**/.next
+**/dist
+**/__pycache__
+.env
+.env.local
+.env.*.local
+docker/postgres_data
+*.log

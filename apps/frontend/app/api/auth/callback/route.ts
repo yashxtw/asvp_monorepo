@@ -14,8 +14,8 @@ export async function GET(req: NextRequest) {
     // Cookie is set by Next.js (same origin)
     res.cookies.set("auth_token", token, {
         httpOnly: true,
-        sameSite: "lax", // no cross-site 
-        secure: false,   // localhost
+        sameSite: "none", // no cross-site , none for cross-site, lax for same-site
+        secure: true,   // localhost: false, production: true
         path: "/",
     });
 

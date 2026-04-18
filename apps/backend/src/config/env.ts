@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export const config = {
-    port: process.env.BACKEND_PORT || 4000,
+    port: Number(process.env.PORT || process.env.BACKEND_PORT || 4000),
 
     db: {
         host: process.env.POSTGRES_HOST || "localhost",

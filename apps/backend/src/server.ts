@@ -2,6 +2,8 @@ import { createApp } from "./api/app";
 import { config } from "./config/env";
 import { logger } from "./lib/logger";
 import { ensureAllAlertsSchedules } from "./lib/alertsScheduler";
+import dns from "dns";
+dns.setDefaultResultOrder("ipv4first");
 
 const app = createApp();
 
