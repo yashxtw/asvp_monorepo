@@ -81,16 +81,18 @@ export default function TopBar({
     return (
         <div
             ref={containerRef}
-            className="flex items-center justify-between border-b border-zinc-300 bg-white px-2  py-2"
+            className="flex flex-col gap-3 border-b border-zinc-300 bg-white px-2 py-2 sm:flex-row sm:items-center sm:justify-between"
         >
 
             {/* LEFT - Brand Selector  */}
-            <div className="relative flex items-center gap-4">
+            <div className="relative flex w-full min-w-0 items-center gap-3 sm:w-auto">
                 <button
                     onClick={() => setShowBrandDropdown(!showBrandDropdown)}
-                    className="flex items-center gap-2 text-sm font-medium transition"
+                    className="flex min-w-0 items-center gap-2 text-left text-sm font-medium transition"
                 >
-                    {selectedBrand?.name || "Select brand"}
+                    <span className="truncate">
+                        {selectedBrand?.name || "Select brand"}
+                    </span>
                     <ChevronDown size={16} />
                 </button>
 
@@ -98,7 +100,7 @@ export default function TopBar({
                 {brandLoadingError && <span className="text-xs text-red-500">{brandLoadingError}</span>}
 
                 {showBrandDropdown && (
-                    <div className="absolute top-5 mt-2 w-48 bg-white border shadow-lg z-50">
+                    <div className="absolute left-0 top-5 z-50 mt-2 w-48 border bg-white shadow-lg">
                         {brands.map((brand) => (
                             <button
                                 key={brand.id}
@@ -116,7 +118,7 @@ export default function TopBar({
             </div>
 
             {/* RIGHT SIDE */}
-            <div className="flex items-center gap-4">
+            <div className="flex w-full flex-wrap items-center gap-3 sm:w-auto sm:flex-nowrap sm:justify-end">
                 <div className="relative">
                     <button
                         onClick={() => setShowSourceDropdown(!showSourceDropdown)}
@@ -175,10 +177,10 @@ export default function TopBar({
                 {/* Export Button */}
                 <button
                     onClick={handleExport}
-                    className="flex items-center gap-2 px-3 py-2 bg-black text-white rounded-lg text-sm font-medium hover:opacity-90 transition"
+                    className="flex items-center gap-2 rounded-lg bg-black px-3 py-2 text-sm font-medium text-white transition hover:opacity-90"
                 >
                     <Download size={16} />
-                    Export
+                    <span className="hidden sm:inline">Export</span>
                 </button>
 
             </div>

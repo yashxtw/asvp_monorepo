@@ -12,14 +12,14 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
     const { selectedBrand } = useBrandSelection();
 
     return (
-        <div className="flex h-screen bg-white">
+        <div className="flex h-screen overflow-x-hidden bg-white">
             <Sidebar
                 collapsed={collapsed}
                 setCollapsed={setCollapsed}
                 selectedBrandName={selectedBrand?.brand_name || null}
                 selectedBrandLogoUrl={selectedBrand?.logo_url || null}
             />
-            <main className="flex-1 text-[#171717] overflow-y-auto p-4">{children}</main>
+            <main className="min-w-0 flex-1 overflow-y-auto p-4 text-[#171717]">{children}</main>
         </div>
     );
 }
