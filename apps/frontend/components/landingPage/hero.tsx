@@ -24,8 +24,20 @@ export default function Hero() {
             />
 
             <div className="max-w-6xl mx-auto px-6 z-10 pt-28 pb-10 text-center">
-                <div className="inline-block mb-6 px-4 py-1.5 text-sm font-medium text-[#1E3A8A]">
-                    AI Search Visibility Platform <span className="bg-[#1E3A8A] text-white px-2 py-1 rounded-lg">for brands that want clarity</span>
+                {/* <div className="inline-block mb-6 px-4 py-2 text-sm font-medium text-black rounded-lg">
+                    AI Search Visibility Platform <span className="font-semibold bg-[#1E3A8A] text-white px-2 py-1 rounded-lg">for brands that want clarity</span>
+                </div> */}
+
+
+                <div className="grid grid-cols-1 md:grid-cols-2 mb-8">
+                    <div className="inline-block md:text-right px-2 py-1 text-sm font-medium text-black rounded-lg">
+                        AI Search Visibility Platform
+                    </div>
+                    <div className="inline-block md:text-left px-2 py-1 text-sm font-medium text-black rounded-lg">
+                        <span className="font-semibold bg-[#1E3A8A] text-white px-2 py-1 rounded-lg">
+                            for brands that want clarity
+                        </span>
+                    </div>
                 </div>
 
                 <h1 className="text-5xl sm:text-6xl md:text-7xl font-extrabold leading-tight tracking-tight">
