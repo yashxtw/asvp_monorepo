@@ -69,12 +69,9 @@ export default function BrandMentionsDashboard({
                 });
                 if (source) params.set("source", source);
 
-                const res = await fetch(
-                    `${process.env.NEXT_PUBLIC_API_BASE}/dashboard/brandMentions?${params.toString()}`,
-                    {
-                        credentials: "include"
-                    }
-                );
+                const res = await fetch(`/api/backend/dashboard/brandMentions?${params.toString()}`, {
+                    credentials: "include",
+                });
 
                 const data = await res.json();
                 setResponse(data);

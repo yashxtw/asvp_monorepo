@@ -66,10 +66,9 @@ export default function SentimentDashboard({
                 });
                 if (source) params.set("source", source);
 
-                const res = await fetch(
-                    `${process.env.NEXT_PUBLIC_API_BASE}/dashboard/sentiment-overview?${params.toString()}`,
-                    { credentials: "include" }
-                );
+                const res = await fetch(`/api/backend/dashboard/sentiment-overview?${params.toString()}`, {
+                    credentials: "include",
+                });
 
                 const json: ApiResponse = await res.json();
 

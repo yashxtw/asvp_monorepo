@@ -1,4 +1,5 @@
 "use client";
+import api from "./axios";
 
 export async function getCurrentUser() {
     try {
@@ -29,11 +30,7 @@ export function loginWithGoogle() {
 }
 
 export async function logout() {
-    await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/auth/logout`, {
-        method: "POST",
-        credentials: "include",
-    }).catch(() => null);
-
+    await api.post("/auth/logout").catch(() => null);
     const res = await fetch("/api/auth/logout", {
         method: "POST",
         credentials: "include",

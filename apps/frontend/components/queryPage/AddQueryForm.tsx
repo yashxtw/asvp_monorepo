@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import axios from "axios";
+import axios from "@/lib/axios";
 
 type Brand = {
     id: string;
@@ -47,16 +47,12 @@ export default function AddQueryForm({ brands, onCreated }: Props) {
         setLoading(true);
 
         try {
-            await axios.post(
-                `${process.env.NEXT_PUBLIC_API_BASE}/queries`,
-                {
-                    brand_id: brandId,
-                    query_text: queryText,
-                    query_type: queryType,
-                    frequency,
-                },
-                { withCredentials: true }
-            );
+            await axios.post("/queries", {
+                brand_id: brandId,
+                query_text: queryText,
+                query_type: queryType,
+                frequency,
+            });
 
             setSuccess("Query created successfully");
             setQueryText("");

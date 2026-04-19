@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import axios from "axios";
+import axios from "@/lib/axios";
 import Loading from "@/components/Loading";
 import { RainbowButton } from "@/components/ui/magic/rainbow-button";
 
@@ -133,10 +133,7 @@ export default function AlertsPage() {
             if (brandFilter) params.set("brand_id", brandFilter);
             if (sourceFilter) params.set("source", sourceFilter);
 
-            const res = await axios.get(
-                `${process.env.NEXT_PUBLIC_API_BASE}/alerts?${params.toString()}`,
-                { withCredentials: true }
-            );
+            const res = await axios.get(`/alerts?${params.toString()}`);
             setAlerts(res.data?.data ?? []);
             setSummary(res.data?.summary ?? null);
         } catch {
@@ -148,9 +145,7 @@ export default function AlertsPage() {
 
     useEffect(() => {
         axios
-            .get(`${process.env.NEXT_PUBLIC_API_BASE}/brands`, {
-                withCredentials: true,
-            })
+            .get("/brands")
             .then((res) => {
                 const rawBrands = Array.isArray(res.data) ? res.data : res.data?.brands ?? [];
                 setBrands(rawBrands);
@@ -167,11 +162,7 @@ export default function AlertsPage() {
     async function updateAlert(alertId: string, action: "ack" | "resolve") {
         try {
             setActionLoadingId(`${alertId}:${action}`);
-            await axios.post(
-                `${process.env.NEXT_PUBLIC_API_BASE}/alerts/${alertId}/${action}`,
-                {},
-                { withCredentials: true }
-            );
+            await axios.post(`/alerts/${alertId}/${action}`, {});
             await loadAlerts();
         } catch {
             setError(`Failed to ${action} alert`);
@@ -183,11 +174,7 @@ export default function AlertsPage() {
     async function runAlertGeneration() {
         try {
             setRefreshing(true);
-            await axios.post(
-                `${process.env.NEXT_PUBLIC_API_BASE}/alerts/run`,
-                {},
-                { withCredentials: true }
-            );
+            await axios.post("/alerts/run", {});
             setTimeout(() => {
                 loadAlerts();
                 setRefreshing(false);

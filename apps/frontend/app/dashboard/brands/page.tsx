@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import axios from "axios";
+import axios from "@/lib/axios";
 
 import BrandStats from "@/components/brandsPage/BrandStats";
 import BrandList from "@/components/brandsPage/BrandList";
@@ -41,9 +41,7 @@ export default function NewBrandPage() {
   useEffect(() => {
     setBrandsLoading(true);
     axios
-      .get(`${process.env.NEXT_PUBLIC_API_BASE}/brands`, {
-        withCredentials: true,
-      })
+      .get("/brands")
       .then((res) => {
         setBrands(res.data);
         setBrandsCount(res.data.length);
@@ -54,9 +52,7 @@ export default function NewBrandPage() {
 
   useEffect(() => {
     axios
-      .get(`${process.env.NEXT_PUBLIC_API_BASE}/queries/queries_for_brand_page`, {
-        withCredentials: true,
-      })
+      .get("/queries/queries_for_brand_page")
       .then((res) => {
         setQueryCount(res.data.length);
         const activeCount = res.data.filter((q: any) => q.is_active && !q.is_paused).length;
@@ -67,9 +63,7 @@ export default function NewBrandPage() {
 
   async function refreshBrands() {
     setBrandsLoading(true);
-    axios.get(`${process.env.NEXT_PUBLIC_API_BASE}/brands`, {
-      withCredentials: true,
-    })
+    axios.get("/brands")
       .then((res) => {
         setBrands(res.data);
         setBrandsCount(res.data.length);
@@ -90,9 +84,7 @@ export default function NewBrandPage() {
 
     try {
       setDeletingBrandLoading(true);
-      await axios.delete(`${process.env.NEXT_PUBLIC_API_BASE}/brands/${deletingBrand.id}`, {
-        withCredentials: true,
-      });
+      await axios.delete(`/brands/${deletingBrand.id}`);
       await refreshBrands();
       setDeletingBrand(null);
     } catch (err: any) {
@@ -119,11 +111,7 @@ export default function NewBrandPage() {
 
     try {
       setSavingBrand(true);
-      await axios.patch(
-        `${process.env.NEXT_PUBLIC_API_BASE}/brands/${editingBrand.id}`,
-        payload,
-        { withCredentials: true }
-      );
+      await axios.patch(`/brands/${editingBrand.id}`, payload);
       await refreshBrands();
       setEditingBrand(null);
     } catch (err: any) {
@@ -134,10 +122,7 @@ export default function NewBrandPage() {
   }
 
   async function getBrandQueryIds(brandId: string): Promise<string[]> {
-    const res = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_BASE}/queries?brand_id=${brandId}`,
-      { withCredentials: true }
-    );
+    const res = await axios.get(`/queries?brand_id=${brandId}`);
     const queries = res.data?.queries ?? res.data ?? [];
     return queries.map((q: any) => q.id);
   }
@@ -162,54 +147,32 @@ export default function NewBrandPage() {
 
       for (const queryId of queryIds) {
         if (action === "run_once") {
-          await axios.post(
-            `${process.env.NEXT_PUBLIC_API_BASE}/queries/${queryId}/manual-run`,
-            {},
-            { withCredentials: true }
-          );
+          await axios.post(`/queries/${queryId}/manual-run`, {});
           continue;
         }
 
         if (action === "activate") {
-          await axios.post(
-            `${process.env.NEXT_PUBLIC_API_BASE}/queries/${queryId}/auto-schedule`,
-            {},
-            { withCredentials: true }
-          );
+          await axios.post(`/queries/${queryId}/auto-schedule`, {});
           continue;
         }
 
         if (action === "pause") {
-          await axios.post(
-            `${process.env.NEXT_PUBLIC_API_BASE}/queries/${queryId}/pause`,
-            {},
-            { withCredentials: true }
-          );
+          await axios.post(`/queries/${queryId}/pause`, {});
           continue;
         }
 
         if (action === "resume") {
-          await axios.post(
-            `${process.env.NEXT_PUBLIC_API_BASE}/queries/${queryId}/resume`,
-            {},
-            { withCredentials: true }
-          );
+          await axios.post(`/queries/${queryId}/resume`, {});
           continue;
         }
 
         if (action === "unschedule") {
-          await axios.post(
-            `${process.env.NEXT_PUBLIC_API_BASE}/queries/${queryId}/unschedule`,
-            {},
-            { withCredentials: true }
-          );
+          await axios.post(`/queries/${queryId}/unschedule`, {});
         }
       }
 
       await refreshBrands();
-      const queryRes = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE}/queries/queries_for_brand_page`, {
-        withCredentials: true,
-      });
+      const queryRes = await axios.get("/queries/queries_for_brand_page");
       setQueryCount(queryRes.data.length);
       setActiveQueryCount(queryRes.data.filter((q: any) => q.is_active && !q.is_paused).length);
     } catch (err: any) {

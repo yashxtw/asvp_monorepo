@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import axios from "axios";
 import TopBar from "@/components/dashboard/TopBar";
 import VisibilityOverview from "@/components/dashboard/VisibilityOverview";
 import KPIGrid from "@/components/dashboard/KPIGrid";
@@ -12,6 +11,7 @@ import {
     DashboardBrand,
     useBrandSelection,
 } from "@/components/dashboard/BrandSelectionContext";
+import axios from "@/lib/axios";
 
 export default function DashboardPage() {
     const {
@@ -57,11 +57,9 @@ export default function DashboardPage() {
         async function loadBrands() {
             try {
                 setLoadingBrands(true);
-                const res = await axios.get(
-                    `${process.env.NEXT_PUBLIC_API_BASE}/brands/for_dashboard`,
-                    { withCredentials: true }
-                );
-                const data = (Array.isArray(res.data) ? res.data : []) as DashboardBrand[];
+                const res = await axios.get("/brands/for_dashboard");
+                const json = await res.data;
+                const data = (Array.isArray(json) ? json : []) as DashboardBrand[];
 
                 setBrands(data);
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import axios from "axios";
+import axios from "@/lib/axios";
 import { UsageBar } from "@/components/UsageBar";
 import PricingSection from "@/components/landingPage/SubscriptionPlans";
 import Loading from "@/components/Loading";
@@ -36,9 +36,7 @@ export default function BillingUsagePage() {
 
     useEffect(() => {
         axios
-            .get(`${process.env.NEXT_PUBLIC_API_BASE}/billing/usage`, {
-                withCredentials: true,
-            })
+            .get("/billing/usage")
             .then((res) => setUsage(res.data))
             .catch(() => setError("Failed to load usage"))
             .finally(() => setLoading(false));

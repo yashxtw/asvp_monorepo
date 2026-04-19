@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "@/lib/axios";
 import QueryList from "@/components/queryPage/QueryList";
 import KPIGrid from "@/components/queryPage/QueryStats";
 
@@ -53,9 +53,7 @@ export default function NewQueryPage() {
 
     useEffect(() => {
         axios
-            .get(`${process.env.NEXT_PUBLIC_API_BASE}/brands/for_dashboard`, {
-                withCredentials: true,
-            })
+            .get("/brands/for_dashboard")
             .then((res) => setBrands(res.data))
             .catch(() => setQueryError("Failed to load brands"));
     }, []);
@@ -66,18 +64,15 @@ export default function NewQueryPage() {
             setQueryError(null);
 
             try {
-                const url = filterBrandId
-                    ? new URL(`${process.env.NEXT_PUBLIC_API_BASE}/queries`)
-                    : new URL(`${process.env.NEXT_PUBLIC_API_BASE}/queries`);
-
+                const params = new URLSearchParams();
                 if (filterBrandId) {
-                    url.searchParams.set("brand_id", filterBrandId);
+                    params.set("brand_id", filterBrandId);
                 }
                 if (filterSourceType) {
-                    url.searchParams.set("source_type", filterSourceType);
+                    params.set("source_type", filterSourceType);
                 }
 
-                const res = await axios.get(url.toString(), { withCredentials: true });
+                const res = await axios.get(`/queries${params.toString() ? `?${params.toString()}` : ""}`);
                 setQueries(res.data?.queries ?? res.data);
             } catch {
                 setQueryError("Failed to load queries");
@@ -94,15 +89,15 @@ export default function NewQueryPage() {
         setQueryError(null);
 
         try {
-            const url = new URL(`${process.env.NEXT_PUBLIC_API_BASE}/queries`);
+            const params = new URLSearchParams();
             if (filterBrandId) {
-                url.searchParams.set("brand_id", filterBrandId);
+                params.set("brand_id", filterBrandId);
             }
             if (filterSourceType) {
-                url.searchParams.set("source_type", filterSourceType);
+                params.set("source_type", filterSourceType);
             }
 
-            const res = await axios.get(url.toString(), { withCredentials: true });
+            const res = await axios.get(`/queries${params.toString() ? `?${params.toString()}` : ""}`);
             setQueries(res.data?.queries ?? res.data);
         } catch {
             setQueryError("Failed to load queries");
@@ -131,55 +126,32 @@ export default function NewQueryPage() {
         for (const queryId of queryIds) {
             try {
                 if (action === "run_once") {
-                    await axios.post(
-                        `${process.env.NEXT_PUBLIC_API_BASE}/queries/${queryId}/manual-run`,
-                        {},
-                        { withCredentials: true }
-                    );
+                    await axios.post(`/queries/${queryId}/manual-run`, {});
                     continue;
                 }
 
                 if (action === "delete") {
-                    await axios.delete(
-                        `${process.env.NEXT_PUBLIC_API_BASE}/queries/${queryId}`,
-                        { withCredentials: true }
-                    );
+                    await axios.delete(`/queries/${queryId}`);
                     continue;
                 }
 
                 if (action === "pause") {
-                    await axios.post(
-                        `${process.env.NEXT_PUBLIC_API_BASE}/queries/${queryId}/pause`,
-                        {},
-                        { withCredentials: true }
-                    );
+                    await axios.post(`/queries/${queryId}/pause`, {});
                     continue;
                 }
 
                 if (action === "activate") {
-                    await axios.post(
-                        `${process.env.NEXT_PUBLIC_API_BASE}/queries/${queryId}/auto-schedule`,
-                        {},
-                        { withCredentials: true }
-                    );
+                    await axios.post(`/queries/${queryId}/auto-schedule`, {});
                     continue;
                 }
 
                 if (action === "unschedule") {
-                    await axios.post(
-                        `${process.env.NEXT_PUBLIC_API_BASE}/queries/${queryId}/unschedule`,
-                        {},
-                        { withCredentials: true }
-                    );
+                    await axios.post(`/queries/${queryId}/unschedule`, {});
                     continue;
                 }
 
                 if (action === "resume") {
-                    await axios.post(
-                        `${process.env.NEXT_PUBLIC_API_BASE}/queries/${queryId}/resume`,
-                        {},
-                        { withCredentials: true }
-                    );
+                    await axios.post(`/queries/${queryId}/resume`, {});
                 }
             } catch (err: any) {
                 const code = err?.response?.data?.error;

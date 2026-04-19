@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import axios from "axios";
+import axios from "@/lib/axios";
 import Loading from "@/components/Loading";
 
 type AnswerEntity = {
@@ -70,9 +70,7 @@ export default function AnalyticsPage() {
 
     useEffect(() => {
         axios
-            .get(`${process.env.NEXT_PUBLIC_API_BASE}/brands`, {
-                withCredentials: true,
-            })
+            .get("/brands")
             .then((res) => setBrands(Array.isArray(res.data) ? res.data : []))
             .catch(() => {});
     }, []);
@@ -86,14 +84,7 @@ export default function AnalyticsPage() {
         setError(null);
 
         axios
-            .get(
-                `${process.env.NEXT_PUBLIC_API_BASE}/dashboard/answers${
-                    params.toString() ? `?${params.toString()}` : ""
-                }`,
-                {
-                    withCredentials: true,
-                }
-            )
+            .get(`/dashboard/answers${params.toString() ? `?${params.toString()}` : ""}`)
             .then((res) => {
                 setGroups(res.data?.data ?? []);
             })

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import axios from "axios";
+import axios from "@/lib/axios";
 import Loading from "@/components/Loading";
 import { RainbowButton } from "@/components/ui/magic/rainbow-button";
 
@@ -64,9 +64,7 @@ export default function RecommendationsPage() {
         try {
             setLoading(true);
             setError(null);
-            const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE}/recommendations`, {
-                withCredentials: true,
-            });
+            const res = await axios.get("/recommendations");
             setRecommendations(res.data?.data ?? []);
         } catch (err: any) {
             setError(err?.response?.data?.error || "Failed to load recommendations");
@@ -82,11 +80,7 @@ export default function RecommendationsPage() {
     async function runRecommendations() {
         try {
             setRefreshing(true);
-            await axios.post(
-                `${process.env.NEXT_PUBLIC_API_BASE}/recommendations/run`,
-                {},
-                { withCredentials: true }
-            );
+            await axios.post("/recommendations/run", {});
             setTimeout(() => {
                 loadRecommendations();
                 setRefreshing(false);
@@ -100,11 +94,7 @@ export default function RecommendationsPage() {
     async function resolveRecommendation(id: string) {
         try {
             setActionLoadingId(id);
-            await axios.post(
-                `${process.env.NEXT_PUBLIC_API_BASE}/recommendations/${id}/resolve`,
-                {},
-                { withCredentials: true }
-            );
+            await axios.post(`/recommendations/${id}/resolve`, {});
             await loadRecommendations();
         } catch {
             setError("Failed to resolve recommendation");

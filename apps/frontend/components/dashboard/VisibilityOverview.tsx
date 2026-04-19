@@ -15,7 +15,7 @@ import {
   Area,
 } from "recharts";
 import { motion } from "framer-motion";
-import axios from "axios";
+import axios from "@/lib/axios";
 
 type RunRow = {
   created_at: string;
@@ -64,12 +64,7 @@ export default function VisibilityOverview({
         });
         if (source) params.set("source", source);
 
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_BASE}/dashboard/visibility-overview?${params.toString()}`,
-          {
-            withCredentials: true,
-          }
-        );
+        const res = await axios.get(`/dashboard/visibility-overview?${params.toString()}`);
         setData(res.data?.data || []);
       } catch (error) {
         console.error("Error fetching visibility overview data:", error);

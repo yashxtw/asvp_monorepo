@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import axios from "axios";
+import axios from "@/lib/axios";
 
 type props = {
     refreshBrands: () => Promise<void> | void;
@@ -39,23 +39,19 @@ export default function AddBrandForm({refreshBrands}: props) {
         setLoading(true);
 
         try {
-            await axios.post(
-                `${process.env.NEXT_PUBLIC_API_BASE}/brands`,
-                {
-                    brand_name: name.trim(),
-                    canonical_urls: urls
-                        .split("\n")
-                        .map((u) => u.trim())
-                        .filter(Boolean),
-                    description: description.trim(),
-                    logo_url: logoUrl.trim(),
-                    competitors: competitors
-                        .split("\n")
-                        .map((c) => c.trim())
-                        .filter(Boolean),
-                },
-                { withCredentials: true }
-            );
+            await axios.post("/brands", {
+                brand_name: name.trim(),
+                canonical_urls: urls
+                    .split("\n")
+                    .map((u) => u.trim())
+                    .filter(Boolean),
+                description: description.trim(),
+                logo_url: logoUrl.trim(),
+                competitors: competitors
+                    .split("\n")
+                    .map((c) => c.trim())
+                    .filter(Boolean),
+            });
 
             setSuccess("Brand created successfully");
             setName("");

@@ -73,10 +73,9 @@ export default function ProminenceDashboard({
                 });
                 if (source) params.set("source", source);
 
-                const res = await fetch(
-                    `${process.env.NEXT_PUBLIC_API_BASE}/dashboard/prominenceTrend?${params.toString()}`,
-                    { credentials: "include" }
-                );
+                const res = await fetch(`/api/backend/dashboard/prominenceTrend?${params.toString()}`, {
+                    credentials: "include",
+                });
 
                 const json: ApiResponse = await res.json();
 
