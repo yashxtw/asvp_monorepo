@@ -34,11 +34,6 @@ export default function SigninPage() {
                         visibility gaps with confidence.
                     </p>
 
-                    <div className="mt-4 rounded-2xl border border-zinc-200 bg-zinc-50 p-4 text-sm leading-relaxed text-zinc-700">
-                        Inside VerityAI you can track brands and queries, compare responses across ChatGPT, Gemini,
-                        Claude, and Google AI Overviews, review alerts, and move from raw answer data to clear recommendations.
-                    </div>
-
                     <button
                         onClick={() => {
                             setLoading(true);

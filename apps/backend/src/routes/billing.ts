@@ -33,8 +33,8 @@ router.post("/subscribe", requireAuth, async (req, res) => {
             SELECT razorpay_payment_link_id
             FROM customers
             WHERE id = $1
-              AND billing_status = 'pending'
-              AND razorpay_payment_link_id IS NOT NULL
+                AND billing_status = 'pending'
+                AND razorpay_payment_link_id IS NOT NULL
             `,
             [customerId]
         );

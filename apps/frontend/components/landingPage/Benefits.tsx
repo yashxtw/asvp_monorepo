@@ -37,7 +37,7 @@ export default function BenefitsSection() {
     return (
         <section className="py-10 text-[#171717]">
             <div className="mx-auto max-w-7xl px-6 md:px-20">
-                <div className="mx-auto mb-20 max-w-4xl text-center">
+                <div className="mx-auto mb-10 max-w-4xl text-center">
                     <h2 className="text-4xl font-bold tracking-tight md:text-5xl">
                         <span className="text-zinc-600">What makes</span> VerityAI useful{" "}
                         <span className="text-zinc-600">in real workflows</span>

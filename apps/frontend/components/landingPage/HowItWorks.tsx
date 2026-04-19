@@ -26,9 +26,9 @@ const steps = [
 
 export default function HowItWorks() {
     return (
-        <section id="how-it-works" className="py-28 relative text-[#171717]">
+        <section id="how-it-works" className="pt-10 relative text-[#171717]">
             <div className="max-w-7xl mx-auto px-6 md:px-20">
-                <div className="text-center max-w-3xl mx-auto mb-20">
+                <div className="text-center max-w-3xl mx-auto mb-10">
                     <h2 className="text-4xl md:text-5xl font-bold tracking-tight">
                         <span className="text-zinc-600">How the</span> platform works
                     </h2>

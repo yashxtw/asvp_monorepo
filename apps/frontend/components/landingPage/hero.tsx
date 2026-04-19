@@ -18,12 +18,12 @@ export default function Hero() {
         <section className="relative overflow-hidden text-[#171717]">
             <InteractiveGridPattern
                 className={cn(
-                    "[mask-image:radial-gradient(400px_circle_at_center,white,transparent)]",
+                    "mask-[radial-gradient(400px_circle_at_center,white,transparent)]",
                     "inset-x-0 inset-y-[-30%] h-[130%] skew-y-12 -z-10"
                 )}
             />
 
-            <div className="max-w-6xl mx-auto px-6 z-10 py-28 text-center">
+            <div className="max-w-6xl mx-auto px-6 z-10 pt-28 pb-10 text-center">
                 <div className="inline-block mb-6 rounded-full bg-zinc-200 px-4 py-1.5 text-sm font-medium text-zinc-700">
                     AI Search Visibility Platform for brands that want clarity
                 </div>
@@ -35,9 +35,7 @@ export default function Hero() {
                 </h1>
 
                 <p className="mt-8 max-w-3xl mx-auto text-lg sm:text-xl text-zinc-700 leading-relaxed">
-                    VerityAI helps teams understand how major AI systems describe their brand,
-                    where competitors are taking the narrative, and what should be improved next.
-                    It is built for the full loop: monitoring, analytics, alerts, and recommendations.
+                    VerityAI shows how AI systems describe your brand, where competitors win, and what to improve next.
                 </p>
 
                 <div className="mt-8 grid gap-3 text-left sm:grid-cols-2 lg:grid-cols-4">

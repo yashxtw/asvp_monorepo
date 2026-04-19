@@ -34,11 +34,6 @@ export default function SignupPage() {
                         your team should improve next.
                     </p>
 
-                    <div className="mt-4 rounded-2xl border border-zinc-200 bg-zinc-50 p-4 text-sm leading-relaxed text-zinc-700">
-                        VerityAI is designed to give teams clarity fast: set up brands, add tracked queries, monitor
-                        visibility and sentiment, catch changes with alerts, and turn evidence into a smarter response plan.
-                    </div>
-
                     <button
                         onClick={() => {
                             setLoading(true);
