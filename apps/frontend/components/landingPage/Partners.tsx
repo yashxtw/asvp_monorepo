@@ -61,8 +61,8 @@ import Image from "next/image";
 
 const reviews = [
     {
-        name: "###",
-        img: "",
+        name: "VerityAI",
+        img: "https://verityai-frontend.vercel.app/favicon.ico",
     },
     {
         name: "###",
