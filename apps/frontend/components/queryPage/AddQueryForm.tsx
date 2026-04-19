@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import axios from "@/lib/axios";
+import { isAxiosError } from "axios";
 
 type Brand = {
     id: string;
@@ -60,7 +61,7 @@ export default function AddQueryForm({ brands, onCreated }: Props) {
             setQueryType("category");
             await onCreated();
         } catch (err: any) {
-            if (axios.isAxiosError(err)) {
+            if (isAxiosError(err)) {
                 setError(
                     err.response?.data?.error ||
                     err.response?.data?.message ||
