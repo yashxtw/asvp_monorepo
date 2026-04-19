@@ -24,12 +24,12 @@ export default function Hero() {
             />
 
             <div className="max-w-6xl mx-auto px-6 z-10 pt-28 pb-10 text-center">
-                <div className="inline-block mb-6 rounded-full bg-zinc-200 px-4 py-1.5 text-sm font-medium text-zinc-700">
-                    AI Search Visibility Platform for brands that want clarity
+                <div className="inline-block mb-6 px-4 py-1.5 text-sm font-medium text-[#1E3A8A]">
+                    AI Search Visibility Platform <span className="bg-[#1E3A8A] text-white px-2 py-1 rounded-lg">for brands that want clarity</span>
                 </div>
 
                 <h1 className="text-5xl sm:text-6xl md:text-7xl font-extrabold leading-tight tracking-tight">
-                    <span className="text-zinc-600">If AI answers shape discovery,</span>
+                    <span className="text-[#1E3A8A]">If AI answers shape discovery,</span>
                     <br />
                     your brand needs to be part of the answer.
                 </h1>
@@ -42,7 +42,7 @@ export default function Hero() {
                     {highlights.map((item) => (
                         <div
                             key={item}
-                            className="rounded-2xl border border-zinc-200 bg-white/85 px-4 py-3 text-sm text-zinc-700 shadow-sm"
+                            className="rounded-2xl border-t border-[#1E3A8A] shadow-sm shadow-[#1E3A8A]/20 bg-white/85 px-4 py-3 text-sm text-zinc-700 "
                         >
                             {item}
                         </div>
@@ -52,7 +52,7 @@ export default function Hero() {
                 <div className="mt-12 flex justify-center gap-4">
                     <button
                         onClick={() => router.push("/dashboard")}
-                        className="rounded-xl bg-(--primary) px-4 py-2 font-semibold text-white shadow-lg transition-all duration-300 hover:bg-black hover:shadow-xl"
+                        className="rounded-xl bg-black cursor-pointer px-4 py-2 font-semibold text-white shadow-lg transition-all duration-300 hover:shadow-xl"
                     >
                         Start Monitoring
                     </button>

@@ -17,7 +17,7 @@ export default async function Page() {
       <Header />
       <main>
         <Hero />
-        {/* <PartnersSection /> */}
+        <PartnersSection />
         <BenefitsSection />
         <DemoSection />
         <HowItWorks />

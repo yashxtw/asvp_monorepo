@@ -47,7 +47,7 @@ export default function Header() {
 
                     <Button
                         onClick={() => router.push("/dashboard")}
-                        className="rounded-lg cursor-pointer bg-(--primary) px-5 py-2 text-sm font-semibold text-white hover:bg-black transition"
+                        className="rounded-lg cursor-pointer bg-black px-5 py-2 text-sm font-semibold text-white transition"
                     >
                         Dashboard
                     </Button>

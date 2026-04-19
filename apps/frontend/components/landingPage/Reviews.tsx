@@ -49,7 +49,7 @@ export default function Testimonials() {
         <section className="max-w-7xl mx-auto px-6 pt-10 text-[#171717] md:px-20">
             <div className="mb-16 text-center">
                 <h2 className="text-4xl md:text-5xl font-bold tracking-tight">
-                    Teams building an edge <span className="text-zinc-600">in AI search with</span> VerityAI
+                    Teams building an edge <span className="text-[#1E3A8A]">in AI search with</span> VerityAI
                 </h2>
                 <p className="mt-6 text-lg text-zinc-600">
                     The teams that start measuring AI answer visibility early usually make faster content decisions,

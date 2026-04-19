@@ -8,7 +8,7 @@ function BenefitCard({
     icon: Icon,
     className,
     titleClassName = "text-xl md:text-2xl",
-    tone = "bg-white border border-zinc-200",
+    tone = "bg-white",
 }: {
     title: string;
     description: string;
@@ -19,7 +19,7 @@ function BenefitCard({
 }) {
     return (
         <div
-            className={`${tone} ${className ?? ""} flex min-h-[240px] flex-col justify-between rounded-2xl p-6 shadow-sm transition hover:shadow-md md:p-8`}
+            className={`${tone} ${className ?? ""} flex min-h-[240px] flex-col justify-between rounded-2xl p-6 transition hover:shadow-md md:p-8`}
         >
             <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/80 ring-1 ring-zinc-200">
                 <Icon className="h-6 w-6 text-[#171717]" />
@@ -39,8 +39,8 @@ export default function BenefitsSection() {
             <div className="mx-auto max-w-7xl px-6 md:px-20">
                 <div className="mx-auto mb-10 max-w-4xl text-center">
                     <h2 className="text-4xl font-bold tracking-tight md:text-5xl">
-                        <span className="text-zinc-600">What makes</span> VerityAI useful{" "}
-                        <span className="text-zinc-600">in real workflows</span>
+                        <span className="text-[#1E3A8A]">What makes</span> VerityAI useful{" "}
+                        <span className="text-[#1E3A8A]">in real workflows</span>
                     </h2>
                     <p className="mt-6 text-lg text-zinc-600">
                         This is not just a dashboard of vague AI mentions. The platform is designed to help teams
@@ -71,7 +71,7 @@ export default function BenefitsSection() {
                         title="Actionable analytics"
                         description="Measure mention rate, average visibility, prominence, sentiment, and grouped executions so decisions come from evidence rather than intuition."
                         icon={BarChart3}
-                        className="md:col-span-3"
+                        className="md:col-span-3 border-t border-[#1E3A8A] shadow-sm shadow-[#1E3A8A]/20"
                         titleClassName="text-xl"
                     />
 
@@ -79,7 +79,7 @@ export default function BenefitsSection() {
                         title="Query and brand operations"
                         description="Organize monitoring by brand and tracked query, schedule runs automatically, compare query performance by source, and make AI visibility a managed part of your growth process."
                         icon={TrendingUp}
-                        className="md:col-span-6"
+                        className="md:col-span-6 border-t border-[#1E3A8A] shadow-sm shadow-[#1E3A8A]/20"
                     />
 
                     <BenefitCard

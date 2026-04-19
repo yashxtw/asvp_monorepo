@@ -67,7 +67,7 @@ export default function PricingSection() {
         <section className="py-16 text-[#171717] text-center">
             <div className="max-w-7xl mx-auto px-8 md:px-20">
                 <h2 className="mb-4 text-4xl font-bold">
-                    <span className="text-zinc-600">Simple, transparent</span> pricing
+                    <span className="text-[#1E3A8A]">Simple, transparent</span> pricing
                 </h2>
                 <p className="mx-auto mb-14 max-w-3xl text-muted-foreground">
                     Start by understanding the signal, then grow into a proper AI visibility operating system as your
@@ -83,7 +83,7 @@ export default function PricingSection() {
                             }`}
                         >
                             {plan.popular && (
-                                <span className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full bg-[#44413E] px-4 py-1 text-xs text-[#E8E8E3]">
+                                <span className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full bg-[#1E3A8A] px-4 py-1 text-xs text-white">
                                     Most Popular
                                 </span>
                             )}

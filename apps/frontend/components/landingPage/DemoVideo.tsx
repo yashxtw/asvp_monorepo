@@ -10,7 +10,7 @@ export default function DemoSection() {
                     <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">
                         Watch how a team goes from
                         <br />
-                        AI blind spots to action.
+                        <span className="text-[#1E3A8A]">AI blind spots to action.</span>
                     </h2>
 
                     <p className="mt-6 max-w-md text-lg text-zinc-600">
@@ -19,7 +19,7 @@ export default function DemoSection() {
                         response plan.
                     </p>
 
-                    <button className="mt-8 rounded-full bg-black px-6 py-3 text-sm font-medium text-white shadow-md transition hover:-translate-y-0.5 hover:shadow-lg">
+                    <button className="mt-8 rounded-xl bg-black px-6 py-3 text-sm font-medium text-white shadow-md transition hover:-translate-y-0.5 hover:shadow-lg">
                         See the product in motion
                     </button>
                 </div>

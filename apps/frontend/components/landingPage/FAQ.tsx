@@ -13,7 +13,7 @@ export default function FAQ() {
                     <p className="mb-4 text-sm italic text-gray-600">Got questions?</p>
 
                     <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">
-                        Here are the answers.
+                        <span className="text-[#1E3A8A]">Frequently asked</span> questions.
                     </h2>
 
                     <p className="mt-6 max-w-md text-lg text-zinc-600">
@@ -21,7 +21,7 @@ export default function FAQ() {
                         visibility should become part of their operating model.
                     </p>
 
-                    <button className="mt-8 rounded-full bg-black px-6 py-3 text-sm font-medium text-white shadow-md transition hover:shadow-lg">
+                    <button className="mt-8 rounded-full cursor-pointer bg-black px-6 py-3 text-sm font-medium text-white shadow-md transition hover:shadow-lg">
                         Contact Us
                     </button>
                 </div>
