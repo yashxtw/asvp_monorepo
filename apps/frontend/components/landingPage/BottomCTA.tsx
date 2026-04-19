@@ -2,38 +2,37 @@ import Image from "next/image";
 
 export default function BottomCTA() {
     return (
-        <section className="relative px-4 pt-10 pb-20  text-[#171717]">
+        <section className="relative px-4 pt-10 pb-20 text-[#171717]">
             <div className="mx-auto max-w-6xl overflow-hidden rounded-3xl bg-linear-to-br from-black via-neutral-900 to-neutral-800 text-white shadow-2xl">
-
                 <div className="grid items-center gap-10 p-10 md:grid-cols-2 md:p-16">
-
                     <div>
                         <h2 className="text-3xl font-bold leading-tight md:text-4xl">
-                            Dominate AI Search Results Before Your Competitors Do 🚀
+                            Build an AI visibility workflow before competitors lock in the narrative
                         </h2>
 
-                        <p className="mt-4 text-neutral-300 text-lg">
-                            ASVP helps brands track, optimize, and improve their visibility
-                            across AI-powered search engines like ChatGPT, Gemini, and Perplexity.
+                        <p className="mt-4 text-lg text-neutral-300">
+                            VerityAI gives your team a system: monitor the answers that matter, understand why your
+                            brand is weak or missing, and respond with better decisions.
                         </p>
 
                         <p className="mt-4 text-neutral-400">
-                            Stop guessing. Start ranking where it actually matters.
+                            If AI assistants already influence research and buying behavior in your category, this is a
+                            capability worth building early.
                         </p>
 
                         <div className="mt-8 flex flex-wrap gap-4">
                             <a
-                                href="/get-started"
+                                href="/signup"
                                 className="rounded-xl bg-white px-6 py-3 text-sm font-semibold text-black transition hover:scale-105"
                             >
-                                Get Started
+                                Start with VerityAI
                             </a>
 
                             <a
-                                href="/how-it-works"
+                                href="#how-it-works"
                                 className="rounded-xl border border-white/30 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
                             >
-                                See How It Works
+                                Explore the workflow
                             </a>
                         </div>
                     </div>
@@ -47,11 +46,10 @@ export default function BottomCTA() {
                                 className="rounded-2xl object-contain"
                             />
                         </div>
-                        <p className="text-sm italic text-center mt-2 opacity-30 text-gray-100 mb-4">
-                        —— Dashboard
-                    </p>
+                        <p className="mb-4 mt-2 text-center text-sm italic text-gray-100 opacity-30">
+                            - Dashboard preview
+                        </p>
                     </div>
-
                 </div>
             </div>
         </section>

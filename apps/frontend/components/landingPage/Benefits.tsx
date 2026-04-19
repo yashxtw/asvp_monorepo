@@ -1,73 +1,95 @@
 "use client";
 
-import { BarChart3, Brain, Eye, TrendingUp, ShieldCheck } from "lucide-react";
+import { BarChart3, Brain, Eye, ShieldCheck, TrendingUp } from "lucide-react";
+
+function BenefitCard({
+    title,
+    description,
+    icon: Icon,
+    className,
+    titleClassName = "text-xl md:text-2xl",
+    tone = "bg-white border border-zinc-200",
+}: {
+    title: string;
+    description: string;
+    icon: React.ComponentType<{ className?: string }>;
+    className?: string;
+    titleClassName?: string;
+    tone?: string;
+}) {
+    return (
+        <div
+            className={`${tone} ${className ?? ""} flex min-h-[240px] flex-col justify-between rounded-2xl p-6 shadow-sm transition hover:shadow-md md:p-8`}
+        >
+            <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/80 ring-1 ring-zinc-200">
+                <Icon className="h-6 w-6 text-[#171717]" />
+            </div>
+
+            <div className="space-y-3">
+                <h3 className={`${titleClassName} font-semibold leading-tight text-[#171717]`}>{title}</h3>
+                <p className="text-sm leading-7 text-zinc-600 md:text-base">{description}</p>
+            </div>
+        </div>
+    );
+}
 
 export default function BenefitsSection() {
     return (
         <section className="py-10 text-[#171717]">
-            <div className="max-w-7xl mx-auto px-6 md:px-20">
-
-                <div className="text-center max-w-3xl mx-auto mb-20">
-                    <h2 className="text-4xl md:text-5xl font-bold tracking-tight">
-                        <span className="text-zinc-600">Why</span> modern brands <span className="text-zinc-600">use</span> VerityAi.
+            <div className="mx-auto max-w-7xl px-6 md:px-20">
+                <div className="mx-auto mb-20 max-w-4xl text-center">
+                    <h2 className="text-4xl font-bold tracking-tight md:text-5xl">
+                        <span className="text-zinc-600">What makes</span> VerityAI useful{" "}
+                        <span className="text-zinc-600">in real workflows</span>
                     </h2>
                     <p className="mt-6 text-lg text-zinc-600">
-                        Understand how AI models perceive your brand and take control of your visibility before competitors outrank you.
+                        This is not just a dashboard of vague AI mentions. The platform is designed to help teams
+                        understand performance across sources, prioritize fixes, and build a repeatable operating
+                        rhythm around AI visibility.
                     </p>
                 </div>
 
-                <div className="grid grid-cols-12 gap-6">
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-12">
+                    <BenefitCard
+                        title="Competitive intelligence"
+                        description="Spot when competitors are recommended instead of you, which entities appear beside them, and where your brand disappears from answer sets."
+                        icon={Eye}
+                        tone="bg-zinc-100"
+                        className="md:col-span-3"
+                        titleClassName="text-xl"
+                    />
 
-                    {/* TOP ROW */}
-                    <div className="col-span-12 md:col-span-3 h-[220px] bg-gray-100 rounded-2xl p-8 transition flex flex-col">
-                        <Eye className="w-8 h-8 mb-6 text-primary" />
-                        <h3 className="text-xl font-semibold mb-3">Competitive Intelligence</h3>
-                        <p className="text-zinc-600">
-                            See why AI suggests competitors and uncover.
-                        </p>
-                    </div>
+                    <BenefitCard
+                        title="Cross-source AI monitoring"
+                        description="Run the same query across ChatGPT, Gemini, Claude, and Google AI Overviews, then compare visibility, sentiment, prominence, and brand presence side by side. Instead of treating AI visibility as one blurry metric, your team can see exactly which platforms mention you, which ones prefer competitors, where sentiment shifts, and whether the weakness is a broad positioning problem or a source-specific gap that needs a more targeted response."
+                        icon={Brain}
+                        tone="bg-zinc-100"
+                        className="md:col-span-6"
+                    />
 
-                    <div className="col-span-12 md:col-span-6 h-[220px] bg-gray-100 rounded-2xl p-8 transition flex flex-col">
-                        <Brain className="w-8 h-8 mb-6 text-primary" />
-                        <h3 className="text-2xl font-semibold mb-4">
-                            AI Model Visibility Tracking
-                        </h3>
-                        <p className="text-zinc-600 leading-relaxed">
-                            Monitor how ChatGPT, Gemini, and other AI systems describe your brand.
-                        </p>
-                    </div>
+                    <BenefitCard
+                        title="Actionable analytics"
+                        description="Measure mention rate, average visibility, prominence, sentiment, and grouped executions so decisions come from evidence rather than intuition."
+                        icon={BarChart3}
+                        className="md:col-span-3"
+                        titleClassName="text-xl"
+                    />
 
-                    <div className="col-span-12 md:col-span-3 h-[220px] bg-white border rounded-2xl p-8 transition flex flex-col">
-                        <BarChart3 className="w-8 h-8 mb-6 text-primary" />
-                        <h3 className="text-xl font-semibold mb-3">Actionable Insights</h3>
-                        <p className="text-zinc-600">
-                            Get step-by-step recommendations to improve AI discoverability.
-                        </p>
-                    </div>
+                    <BenefitCard
+                        title="Query and brand operations"
+                        description="Organize monitoring by brand and tracked query, schedule runs automatically, compare query performance by source, and make AI visibility a managed part of your growth process."
+                        icon={TrendingUp}
+                        className="md:col-span-6"
+                    />
 
-                    {/* BOTTOM ROW */}
-                    <div className="col-span-12 md:col-span-6 h-[220px] bg-white rounded-2xl p-8 border transition flex flex-col">
-                        <TrendingUp className="w-8 h-8 mb-6 text-primary" />
-                        <h3 className="text-2xl font-semibold mb-4">
-                            Growth-Driven Optimization
-                        </h3>
-                        <p className="text-zinc-600 leading-relaxed">
-                            Align your content, authority, and positioning to increase AI-generated mentions.
-                        </p>
-                    </div>
-
-                    <div className="col-span-12 md:col-span-6 h-[220px] bg-gray-100 rounded-2xl p-8 transition flex flex-col">
-                        <ShieldCheck className="w-8 h-8 mb-6 text-primary" />
-                        <h3 className="text-2xl font-semibold mb-4">
-                            Brand Protection
-                        </h3>
-                        <p className="text-zinc-600 leading-relaxed">
-                            Detect misinformation or incorrect AI responses instantly.
-                        </p>
-                    </div>
-
+                    <BenefitCard
+                        title="Alerts and recommendations"
+                        description="Detect visibility drops, negative shifts, and missing-brand answers early, then move directly into recommendations that explain the issue, the evidence behind it, and what to do next."
+                        icon={ShieldCheck}
+                        tone="bg-zinc-100"
+                        className="md:col-span-6"
+                    />
                 </div>
-                
             </div>
         </section>
     );

@@ -179,18 +179,31 @@ export default function DashboardPage() {
                 </>
             ) : (
 
-                <div className="pointer-events-none flex items-end">
-                    <h1 className="
-                    text-[5vw] 
-                    font-extrabold 
-                    tracking-tight 
-                    text-zinc-300/40 
-                    leading-none 
-                    select-none
-                    mask-[linear-gradient(to_bottom,black_60%,transparent)]
-                ">
-                        Select a brand.
+                <div className="rounded-3xl border border-dashed border-zinc-300 bg-zinc-50 px-6 py-10">
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
+                        Start here
+                    </p>
+                    <h1 className="mt-3 text-3xl font-bold tracking-tight text-[#171717]">
+                        Select a brand to unlock the dashboard
                     </h1>
+                    <p className="mt-3 max-w-3xl text-sm leading-7 text-zinc-600">
+                        Once a brand is selected, VerityAI will show how that brand performs across tracked AI queries:
+                        visibility trends, mention rate, prominence, sentiment, and source-level comparisons across
+                        ChatGPT, Gemini, Claude, and Google AI Overviews. If you have not added a brand yet, create one
+                        first and then attach the queries you want the platform to monitor.
+                    </p>
+                    <div className="mt-6 grid gap-3 text-sm text-zinc-700 sm:grid-cols-2 lg:grid-cols-4">
+                        {[
+                            "Track brands and mission-critical queries in one place",
+                            "Compare AI responses source by source instead of guessing",
+                            "Catch drops, missing-brand answers, and sentiment shifts early",
+                            "Use recommendations to turn weak coverage into next steps",
+                        ].map((item) => (
+                            <div key={item} className="rounded-2xl border border-zinc-200 bg-white px-4 py-3 shadow-sm">
+                                {item}
+                            </div>
+                        ))}
+                    </div>
                 </div>
 
             )}

@@ -2,16 +2,15 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { loginWithGoogle } from "../../lib/auth";
 import { useState } from "react";
 import Loading from "@/components/Loading";
+import { loginWithGoogle } from "../../lib/auth";
 
 export default function SignupPage() {
     const [loading, setLoading] = useState(false);
-    return (
-        <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-white">
 
-            {/* Left Image */}
+    return (
+        <div className="min-h-screen grid grid-cols-1 bg-white lg:grid-cols-2">
             <div className="relative hidden lg:block">
                 <Image
                     src="/logan-voss-PAoo2lm4m0k-unsplash.jpg"
@@ -22,68 +21,46 @@ export default function SignupPage() {
                 />
             </div>
 
-            {/* Right Content */}
             <div className="flex items-center justify-center px-6">
                 <div className="w-full max-w-sm">
-
-                    {/* Logo */}
                     <div className="mb-8 flex items-center gap-2">
-                        <Image
-                            src="/logo_black.png"
-                            alt="Verity AI"
-                            width={28}
-                            height={28}
-                            unoptimized
-                        />
-                        <span className="text-lg font-semibold text-[#171717]">
-                            Verity AI
-                        </span>
+                        <Image src="/logo_black.png" alt="Verity AI" width={28} height={28} unoptimized />
+                        <span className="text-lg font-semibold text-[#171717]">Verity AI</span>
                     </div>
 
-                    {/* Heading */}
-                    <h1 className="text-2xl font-semibold text-[#171717]">
-                        Create your account
-                    </h1>
+                    <h1 className="text-2xl font-semibold text-[#171717]">Create your account</h1>
                     <p className="mt-1 text-sm text-zinc-600">
-                        Start tracking your AI visibility.
+                        Start tracking how AI answers represent your brand, where competitors outrank you, and what
+                        your team should improve next.
                     </p>
 
-                    {/* Google Sign Up */}
+                    <div className="mt-4 rounded-2xl border border-zinc-200 bg-zinc-50 p-4 text-sm leading-relaxed text-zinc-700">
+                        VerityAI is designed to give teams clarity fast: set up brands, add tracked queries, monitor
+                        visibility and sentiment, catch changes with alerts, and turn evidence into a smarter response plan.
+                    </div>
+
                     <button
                         onClick={() => {
-                        setLoading(true);
-                        loginWithGoogle();
+                            setLoading(true);
+                            loginWithGoogle();
                         }}
                         disabled={loading}
-                        className="mt-5 w-full cursor-pointer text-[#171717] flex items-center justify-center gap-2 rounded-lg border bg-white py-2.5 text-sm font-medium hover:bg-gray-50 transition"
+                        className="mt-5 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border bg-white py-2.5 text-sm font-medium text-[#171717] transition hover:bg-gray-50"
                     >
-                        <Image
-                            src="/google.png"
-                            unoptimized
-                            alt="Google"
-                            width={16}
-                            height={16}
-                        />
-                        Sign up with Google<span>
-                            {loading && (
-                                <Loading />
-                            )}
-                        </span>
+                        <Image src="/google.png" unoptimized alt="Google" width={16} height={16} />
+                        Sign up with Google
+                        <span>{loading && <Loading />}</span>
                     </button>
 
-                    {/* Divider */}
                     <div className="my-5 flex items-center gap-3">
                         <div className="h-px w-full bg-gray-300" />
                         <span className="text-xs text-gray-500">or</span>
                         <div className="h-px w-full bg-gray-300" />
                     </div>
 
-                    {/* Email Sign Up */}
                     <form className="space-y-3">
                         <div>
-                            <label className="block text-xs font-medium text-gray-700">
-                                Email
-                            </label>
+                            <label className="block text-xs font-medium text-gray-700">Email</label>
                             <input
                                 type="email"
                                 required
@@ -92,9 +69,7 @@ export default function SignupPage() {
                         </div>
 
                         <div>
-                            <label className="block text-xs font-medium text-gray-700">
-                                Password
-                            </label>
+                            <label className="block text-xs font-medium text-gray-700">Password</label>
                             <input
                                 type="password"
                                 required
@@ -104,23 +79,18 @@ export default function SignupPage() {
 
                         <button
                             type="submit"
-                            className="mt-2 w-full cursor-pointer rounded-lg bg-[#44413E] py-2.5 text-sm font-semibold text-white hover:bg-[#171717] transition"
+                            className="mt-2 w-full cursor-pointer rounded-lg bg-[#44413E] py-2.5 text-sm font-semibold text-white transition hover:bg-[#171717]"
                         >
                             Create account
                         </button>
                     </form>
 
-                    {/* Footer */}
                     <p className="mt-5 text-center text-xs text-gray-600">
                         Already have an account?{" "}
-                        <Link
-                            href="/signin"
-                            className="font-medium underline text-[#44413E] hover:underline"
-                        >
+                        <Link href="/signin" className="font-medium text-[#44413E] underline hover:underline">
                             Sign in
                         </Link>
                     </p>
-
                 </div>
             </div>
         </div>

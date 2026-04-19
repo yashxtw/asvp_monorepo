@@ -4,42 +4,36 @@ import Image from "next/image";
 
 const reviews = [
     {
-        name: "Jack",
-        username: "@jack",
-        body: "ASVP completely changed how we approach AI visibility.",
+        name: "Aarav",
+        username: "Growth lead",
+        body: "We stopped treating AI visibility like a vague future trend. VerityAI showed us exactly where our brand was missing and which competitor narratives were winning.",
         img: "/user.png",
     },
     {
-        name: "Jill",
-        username: "@jill",
-        body: "We discovered competitors outranking us in AI models.",
+        name: "Maya",
+        username: "Content strategist",
+        body: "The recommendation flow was the unlock. Instead of just charts, we got evidence-backed direction on what kind of content and positioning work to prioritize.",
         img: "/user.png",
     },
     {
-        name: "John",
-        username: "@john",
-        body: "The insights are incredibly actionable.",
+        name: "Rohan",
+        username: "Founder",
+        body: "The source-by-source comparison changed our approach immediately. One model mentioned us, another ignored us, and that told us where the messaging gap really was.",
         img: "/user.png",
     },
     {
-        name: "Jane",
-        username: "@jane",
-        body: "AI search visibility is the new SEO.",
+        name: "Nina",
+        username: "Brand operator",
+        body: "Alerts helped us catch a visibility drop before it turned into a recurring problem. That alone made the product feel operationally useful.",
         img: "/user.png",
     },
 ];
 
 function ReviewCard({ img, name, username, body }: any) {
     return (
-        <div className="w-72 mx-4 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm hover:shadow-lg transition">
+        <div className="mx-4 w-72 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm transition hover:shadow-lg">
             <div className="flex items-center gap-3">
-                <Image
-                    src={img}
-                    alt={name}
-                    width={36}
-                    height={36}
-                    className="rounded-full"
-                />
+                <Image src={img} alt={name} width={36} height={36} className="rounded-full" />
                 <div>
                     <p className="text-sm font-semibold">{name}</p>
                     <p className="text-xs text-zinc-500">{username}</p>
@@ -52,23 +46,20 @@ function ReviewCard({ img, name, username, body }: any) {
 
 export default function Testimonials() {
     return (
-        <section className="py-24 text-[#171717] max-w-7xl mx-auto px-6 md:px-20">
-
-            <div className="text-center  mb-16 ">
+        <section className="max-w-7xl mx-auto px-6 py-24 text-[#171717] md:px-20">
+            <div className="mb-16 text-center">
                 <h2 className="text-4xl md:text-5xl font-bold tracking-tight">
-                    Brands Winning <span className="text-zinc-600">in AI Search Using</span> VerityAi
+                    Teams building an edge <span className="text-zinc-600">in AI search with</span> VerityAI
                 </h2>
                 <p className="mt-6 text-lg text-zinc-600">
-                    See how growth teams are increasing their visibility across AI models
-                    and outperforming competitors in AI-driven recommendations.
+                    The teams that start measuring AI answer visibility early usually make faster content decisions,
+                    spot competitive threats sooner, and build internal confidence around what to improve next.
                 </p>
             </div>
 
             <div className="relative overflow-hidden">
-
-                <div className="pointer-events-none absolute left-0 top-0 h-full w-32 bg-linear-to-r from-white to-transparent z-10" />
-
-                <div className="pointer-events-none absolute right-0 top-0 h-full w-32 bg-linear-to-l from-white to-transparent z-10" />
+                <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-32 bg-linear-to-r from-white to-transparent" />
+                <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-32 bg-linear-to-l from-white to-transparent" />
 
                 <div className="space-y-5 py-5">
                     <div className="flex w-max animate-scroll-left">
@@ -83,10 +74,7 @@ export default function Testimonials() {
                         ))}
                     </div>
                 </div>
-
             </div>
         </section>
     );
 }
-
-
