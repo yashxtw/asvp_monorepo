@@ -12,7 +12,16 @@ export async function middleware(request: NextRequest) {
     try {
         const secret = new TextEncoder().encode(process.env.NEXT_PUBLIC_JWT_SECRET);
 
-        await jwtVerify(token, secret);
+        const { payload } = await jwtVerify(token, secret);
+
+        if (payload.email_verified !== true) {
+            const email = typeof payload.email === "string" ? payload.email : "";
+            const target = new URL("/verify-email-sent", request.url);
+            if (email) {
+                target.searchParams.set("email", email);
+            }
+            return NextResponse.redirect(target);
+        }
 
         return NextResponse.next();
     } catch (error) {

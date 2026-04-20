@@ -11,6 +11,7 @@ export interface JwtUser {
     user_id: string;
     customer_id: string;
     email: string;
+    email_verified: boolean;
 }
 
 export function requireAuth(
@@ -29,6 +30,10 @@ export function requireAuth(
         token,
         process.env.JWT_SECRET!
         ) as Express.User;
+
+        if (!decoded.email_verified) {
+            return res.status(403).json({ error: "email_not_verified", code: "email_not_verified" });
+        }
 
         req.user = decoded;
         next();
