@@ -1,15 +1,42 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Sidebar from "@/components/Sidebar";
 import {
+    DashboardBrand,
     BrandSelectionProvider,
     useBrandSelection,
 } from "@/components/dashboard/BrandSelectionContext";
+import axios from "@/lib/axios";
 
 function DashboardShell({ children }: { children: React.ReactNode }) {
     const [collapsed, setCollapsed] = useState(false);
-    const { selectedBrand } = useBrandSelection();
+    const { selectedBrand, setBrands } = useBrandSelection();
+
+    useEffect(() => {
+        let active = true;
+
+        async function loadBrands() {
+            try {
+                const res = await axios.get("/brands/for_dashboard");
+                const data = (Array.isArray(res.data) ? res.data : []) as DashboardBrand[];
+
+                if (active) {
+                    setBrands(data);
+                }
+            } catch {
+                if (active) {
+                    setBrands([]);
+                }
+            }
+        }
+
+        loadBrands();
+
+        return () => {
+            active = false;
+        };
+    }, [setBrands]);
 
     return (
         <div className="flex h-screen overflow-x-hidden bg-white">

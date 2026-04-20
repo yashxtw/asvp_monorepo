@@ -35,7 +35,7 @@ export default function Hero() {
                     </div>
                     <div className="inline-block md:text-left px-2 py-1 text-sm font-medium text-black rounded-lg">
                         <span className="font-semibold bg-[#1E3A8A] text-white px-2 py-1 rounded-lg">
-                            for brands that want clarity
+                            for brands that want clarity.
                         </span>
                     </div>
                 </div>

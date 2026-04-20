@@ -65,14 +65,16 @@ export default function PricingSection() {
 
     return (
         <section className="py-16 text-[#171717] text-center">
-            <div className="max-w-7xl mx-auto px-8 md:px-20">
-                <h2 className="mb-4 text-4xl font-bold">
-                    <span className="text-[#1E3A8A]">Simple, transparent</span> pricing
-                </h2>
-                <p className="mx-auto mb-14 max-w-3xl text-muted-foreground">
-                    Start by understanding the signal, then grow into a proper AI visibility operating system as your
+            <div className="max-w-7xl mx-auto px-8 md:px-20 ">
+                <div className="text-center max-w-3xl mx-auto mb-10 py-10">
+                    <h2 className="text-4xl md:text-5xl font-bold tracking-tight">
+                        <span className="text-[#1E3A8A]">Simple, transparent</span> pricing.
+                    </h2>
+                    <p className="mt-6 text-lg text-zinc-600">
+                        Start by understanding the signal, then grow into a proper AI visibility operating system as your
                     team turns monitoring into action.
-                </p>
+                    </p>
+                </div>
 
                 <div className="grid items-end gap-8 sm:grid-cols-2 lg:grid-cols-3">
                     {plans.map((plan) => (

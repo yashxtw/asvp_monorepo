@@ -40,7 +40,7 @@ export default function BenefitsSection() {
                 <div className="mx-auto mb-10 max-w-4xl text-center">
                     <h2 className="text-4xl font-bold tracking-tight md:text-5xl">
                         <span className="text-[#1E3A8A]">What makes</span> VerityAI useful{" "}
-                        <span className="text-[#1E3A8A]">in real workflows</span>
+                        <span className="text-[#1E3A8A]">in real workflows.</span>
                     </h2>
                     <p className="mt-6 text-lg text-zinc-600">
                         This is not just a dashboard of vague AI mentions. The platform is designed to help teams

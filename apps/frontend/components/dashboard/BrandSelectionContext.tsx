@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 export type DashboardBrand = {
     id: string;
@@ -21,6 +21,20 @@ const BrandSelectionContext = createContext<BrandSelectionContextValue | null>(n
 export function BrandSelectionProvider({ children }: { children: React.ReactNode }) {
     const [brands, setBrands] = useState<DashboardBrand[]>([]);
     const [selectedBrandId, setSelectedBrandId] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (brands.length === 0) {
+            if (selectedBrandId !== null) {
+                setSelectedBrandId(null);
+            }
+            return;
+        }
+
+        const stillValid = selectedBrandId ? brands.some((brand) => brand.id === selectedBrandId) : false;
+        if (!stillValid) {
+            setSelectedBrandId(brands[0].id);
+        }
+    }, [brands, selectedBrandId]);
 
     const selectedBrand = useMemo(
         () => brands.find((b) => b.id === selectedBrandId) || null,

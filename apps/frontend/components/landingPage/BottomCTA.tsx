@@ -7,7 +7,7 @@ export default function BottomCTA() {
                 <div className="grid items-center gap-10 p-10 md:grid-cols-2 md:p-16">
                     <div>
                         <h2 className="text-3xl font-bold leading-tight md:text-4xl">
-                            Build an AI visibility workflow before competitors lock in the narrative
+                            Build an AI visibility workflow before competitors lock in the narrative.
                         </h2>
 
                         <p className="mt-4 text-lg text-neutral-300">
