@@ -33,24 +33,24 @@ passport.use(
             );
 
             if (existingUserResult.rows.length > 0) {
-            const existingUser = existingUserResult.rows[0];
-            const linkedUserResult = await db.query(
-                `
-                UPDATE users
-                SET email = $2,
-                    name = $3,
-                    provider_id = $4,
-                    email_verified = true,
-                    email_verified_at = COALESCE(email_verified_at, now()),
-                    email_verification_token_hash = NULL,
-                    email_verification_expires_at = NULL
-                WHERE id = $1
-                RETURNING *
-                `,
-                [existingUser.id, email, profile.displayName, profile.id]
-            );
+                const existingUser = existingUserResult.rows[0];
+                const linkedUserResult = await db.query(
+                    `
+                    UPDATE users
+                    SET email = $2,
+                        name = $3,
+                        provider_id = $4,
+                        email_verified = true,
+                        email_verified_at = COALESCE(email_verified_at, now()),
+                        email_verification_token_hash = NULL,
+                        email_verification_expires_at = NULL
+                    WHERE id = $1
+                    RETURNING *
+                    `,
+                    [existingUser.id, email, profile.displayName, profile.id]
+                );
 
-            return done(null, linkedUserResult.rows[0]);
+                return done(null, linkedUserResult.rows[0]);
             }
 
             // find or create customer

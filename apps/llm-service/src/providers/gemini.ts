@@ -6,17 +6,13 @@ import {
     RecommendOutput,
 } from "./types";
 import { estimateTokens } from "../utils/tokens";
-import path from "path";
-import dotenv from "dotenv";
-
-dotenv.config({
-    path: path.resolve(__dirname, "../../../../.env"),
-});
+import { config } from "../config";
+import { HttpError } from "../utils/errors";
 
 const apiKey = process.env.GEMINI_API_KEY;
 if (!apiKey) throw new Error("GEMINI_API_KEY not set");
 
-const ai = new GoogleGenAI({});
+const ai = new GoogleGenAI({ apiKey });
 const INPUT_COST_PER_1K_TOKENS = 0.0003;
 const OUTPUT_COST_PER_1K_TOKENS = 0.0025;
 
@@ -144,8 +140,8 @@ function normalizeRecommendation(input: RecommendationEngineInput, raw: any): Re
             competitors_detected: Array.isArray(raw?.evidence?.competitors_detected)
                 ? raw.evidence.competitors_detected
                 : Array.isArray(input.competitors_detected)
-                  ? input.competitors_detected
-                  : [],
+                    ? input.competitors_detected
+                    : [],
             observed_gap: String(raw?.evidence?.observed_gap || "Observed visibility gap from current AI answer evidence."),
             raw_text_signals: Array.isArray(raw?.evidence?.raw_text_signals) ? raw.evidence.raw_text_signals : [],
             website_gap_signals: Array.isArray(raw?.evidence?.website_gap_signals) ? raw.evidence.website_gap_signals : [],
@@ -162,12 +158,12 @@ function normalizeRecommendation(input: RecommendationEngineInput, raw: any): Re
         },
         distribution: Array.isArray(raw?.distribution)
             ? raw.distribution.map((entry: any) => ({
-                  platform: String(entry?.platform || "Brand blog / website"),
-                  fit_score: Number(entry?.fit_score ?? 0.6),
-                  reason: String(entry?.reason || "Good fit for publishing this recommendation."),
-                  instructions: String(entry?.instructions || "Publish a high-quality version tailored to the platform."),
-                  content_adaptation: String(entry?.content_adaptation || "Adapt the main content to the platform tone."),
-              }))
+                    platform: String(entry?.platform || "Brand blog / website"),
+                    fit_score: Number(entry?.fit_score ?? 0.6),
+                    reason: String(entry?.reason || "Good fit for publishing this recommendation."),
+                    instructions: String(entry?.instructions || "Publish a high-quality version tailored to the platform."),
+                    content_adaptation: String(entry?.content_adaptation || "Adapt the main content to the platform tone."),
+                }))
             : [],
         priority_score: Number(raw?.priority_score ?? 0.5),
         priority: raw?.priority === "high" || raw?.priority === "low" ? raw.priority : "medium",
@@ -184,30 +180,51 @@ INPUT JSON:
 ${JSON.stringify(input, null, 2)}
 `;
 
-        const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
-            contents: prompt,
-        });
+        let timeoutHandle: NodeJS.Timeout | undefined;
 
-        const promptTokens = estimateTokens(prompt);
-        const text = response.text ?? "";
-        const outputTokens = estimateTokens(text);
-        const totalTokens = promptTokens + outputTokens;
-        const totalEstimatedCost =
-            (promptTokens / 1000) * INPUT_COST_PER_1K_TOKENS +
-            (outputTokens / 1000) * OUTPUT_COST_PER_1K_TOKENS;
+        try {
+            const response = await Promise.race([
+                ai.models.generateContent({
+                    model: "gemini-2.5-flash",
+                    contents: prompt,
+                }),
+                new Promise<never>((_, reject) => {
+                    timeoutHandle = setTimeout(() => {
+                        reject(new HttpError(504, "LLM provider timed out", "llm_timeout"));
+                    }, config.requestTimeoutMs);
+                }),
+            ]);
 
-        console.log("[LLM_USAGE]", {
-            provider: "gemini",
-            totalTokens,
-            estimatedCost: totalEstimatedCost,
-        });
+            const promptTokens = estimateTokens(prompt);
+            const text = response.text ?? "";
+            const outputTokens = estimateTokens(text);
+            const totalTokens = promptTokens + outputTokens;
+            const totalEstimatedCost =
+                (promptTokens / 1000) * INPUT_COST_PER_1K_TOKENS +
+                (outputTokens / 1000) * OUTPUT_COST_PER_1K_TOKENS;
 
-        const parsed = extractJsonArray(text);
-        const recommendations = Array.isArray(parsed)
-            ? parsed.map((entry) => normalizeRecommendation(input, entry))
-            : [normalizeRecommendation(input, parsed)];
+            console.log("[LLM_USAGE]", {
+                provider: "gemini",
+                totalTokens,
+                estimatedCost: totalEstimatedCost,
+            });
 
-        return { recommendations };
+            const parsed = extractJsonArray(text);
+            const recommendations = Array.isArray(parsed)
+                ? parsed.map((entry) => normalizeRecommendation(input, entry))
+                : [normalizeRecommendation(input, parsed)];
+
+            return { recommendations };
+        } catch (error) {
+            if (error instanceof HttpError) {
+                throw error;
+            }
+
+            throw new HttpError(502, "LLM provider request failed", "llm_provider_error");
+        } finally {
+            if (timeoutHandle) {
+                clearTimeout(timeoutHandle);
+            }
+        }
     }
 }

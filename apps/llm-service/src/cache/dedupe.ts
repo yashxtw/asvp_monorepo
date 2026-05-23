@@ -1,7 +1,7 @@
 import crypto from "crypto";
+import { config } from "../config";
 
 const cache = new Map<string, { value: any; expiresAt: number }>();
-const TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 export function getCacheKey(payload: any): string {
     return crypto
@@ -21,8 +21,30 @@ export function getCached(key: string) {
 }
 
 export function setCached(key: string, value: any) {
+    if (cache.size >= config.cacheMaxEntries) {
+        const oldestKey = cache.keys().next().value;
+        if (oldestKey) {
+            cache.delete(oldestKey);
+        }
+    }
+
     cache.set(key, {
         value,
-        expiresAt: Date.now() + TTL_MS
+        expiresAt: Date.now() + config.cacheTtlMs
     });
+}
+
+export function getCacheStats() {
+    let activeEntries = 0;
+    for (const [, entry] of cache) {
+        if (Date.now() <= entry.expiresAt) {
+            activeEntries += 1;
+        }
+    }
+
+    return {
+        entries: activeEntries,
+        maxEntries: config.cacheMaxEntries,
+        ttlMs: config.cacheTtlMs,
+    };
 }

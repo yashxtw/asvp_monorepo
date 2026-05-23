@@ -24,11 +24,27 @@ import { requireAuth } from "../middleware/requireAuth";
 
 export const createApp = () => {
     const app = express();
+    const allowedOrigins = new Set(
+        [
+            process.env.FRONTEND_URL,
+            "http://localhost:3000",
+            "http://127.0.0.1:3000",
+        ].filter((value): value is string => Boolean(value))
+    );
 
     app.use(
         cors({
-            origin: [`${process.env.FRONTEND_URL}`,  "http://localhost:3000",],
+            origin(origin, callback) {
+                // Allow non-browser requests and exact frontend origins.
+                if (!origin || allowedOrigins.has(origin)) {
+                    return callback(null, true);
+                }
+
+                return callback(new Error(`Origin ${origin} is not allowed by CORS`));
+            },
             credentials: true,
+            methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+            allowedHeaders: ["Content-Type", "Authorization"],
         })
     );
 
