@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { requestPasswordReset } from "@/lib/auth";
-import { validateEmail } from "@/lib/passwordValidation";
+import { isBusinessEmail, validateEmail } from "@/lib/passwordValidation";
 
 export default function ForgotPasswordPage() {
     const [email, setEmail] = useState("");
@@ -18,6 +18,11 @@ export default function ForgotPasswordPage() {
 
         if (!validateEmail(email)) {
             setError("Enter a valid email address.");
+            return;
+        }
+
+        if (!isBusinessEmail(email)) {
+            setError("Please use your business email address, not a personal inbox like Gmail.");
             return;
         }
 
@@ -38,6 +43,9 @@ export default function ForgotPasswordPage() {
                 <h1 className="text-2xl font-semibold">Forgot password</h1>
                 <p className="mt-2 text-sm text-zinc-600">
                     Enter the email connected to your account and we&apos;ll send you a reset link.
+                </p>
+                <p className="mt-2 text-xs font-medium text-amber-700">
+                    Business email only. Personal inboxes like Gmail are not supported.
                 </p>
 
                 {error && (

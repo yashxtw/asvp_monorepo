@@ -7,7 +7,7 @@ import { useMemo, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import Loading from "@/components/Loading";
 import { AuthRequestError, loginWithGoogle, signUpWithEmail } from "../../lib/auth";
-import { getPasswordChecks, isPasswordValid, validateEmail } from "@/lib/passwordValidation";
+import { getPasswordChecks, isBusinessEmail, isPasswordValid, validateEmail } from "@/lib/passwordValidation";
 
 function PasswordChecklist({ password }: { password: string }) {
     const checks = getPasswordChecks(password);
@@ -44,6 +44,7 @@ export default function SignupPage() {
     const [submitError, setSubmitError] = useState<string | null>(null);
 
     const isEmailValid = validateEmail(email);
+    const isBusinessEmailValid = isBusinessEmail(email);
     const isWorkspaceValid = workspaceName.trim().length >= 2;
     const isNameValid = name.trim().length >= 2;
     const isConfirmValid = confirmPassword.length > 0 && password === confirmPassword;
@@ -54,10 +55,11 @@ export default function SignupPage() {
             isNameValid &&
             isWorkspaceValid &&
             isEmailValid &&
+            isBusinessEmailValid &&
             passwordOkay &&
             isConfirmValid &&
             !formLoading,
-        [formLoading, isConfirmValid, isEmailValid, isNameValid, isWorkspaceValid, passwordOkay]
+        [formLoading, isBusinessEmailValid, isConfirmValid, isEmailValid, isNameValid, isWorkspaceValid, passwordOkay]
     );
 
     async function handleSubmit(e: React.FormEvent) {
@@ -116,6 +118,9 @@ export default function SignupPage() {
                         Start tracking how AI answers represent your brand, where competitors outrank you, and what
                         your team should improve next.
                     </p>
+                    <p className="mt-2 text-xs font-medium text-amber-700">
+                        Use your work email. Personal inboxes like Gmail are not supported.
+                    </p>
 
                     {submitError && (
                         <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
@@ -132,7 +137,7 @@ export default function SignupPage() {
                         className="mt-5 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border bg-white py-2.5 text-sm font-medium text-[#171717] transition hover:bg-gray-50 disabled:opacity-70"
                     >
                         <Image src="/google.png" unoptimized alt="Google" width={16} height={16} />
-                        Sign up with Google
+                        Sign up with Google (work email)
                         <span>{googleLoading && <Loading />}</span>
                     </button>
 
@@ -178,6 +183,11 @@ export default function SignupPage() {
                             />
                             {email.length > 0 && !isEmailValid && (
                                 <p className="mt-1 text-xs text-red-600">Enter a valid email address.</p>
+                            )}
+                            {email.length > 0 && isEmailValid && !isBusinessEmailValid && (
+                                <p className="mt-1 text-xs text-red-600">
+                                    Please use your business email address, not a personal inbox like Gmail.
+                                </p>
                             )}
                         </div>
 

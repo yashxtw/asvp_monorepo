@@ -7,7 +7,7 @@ import { useMemo, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import Loading from "@/components/Loading";
 import { AuthRequestError, loginWithGoogle, signInWithEmail } from "../../lib/auth";
-import { validateEmail } from "@/lib/passwordValidation";
+import { isBusinessEmail, validateEmail } from "@/lib/passwordValidation";
 
 export default function SigninPage() {
     const router = useRouter();
@@ -21,11 +21,12 @@ export default function SigninPage() {
     const emailTouched = email.length > 0;
     const passwordTouched = password.length > 0;
     const isEmailValid = validateEmail(email);
+    const isBusinessEmailValid = isBusinessEmail(email);
     const isPasswordValid = password.length >= 8;
 
     const formReady = useMemo(
-        () => isEmailValid && isPasswordValid && !formLoading,
-        [formLoading, isEmailValid, isPasswordValid]
+        () => isEmailValid && isBusinessEmailValid && isPasswordValid && !formLoading,
+        [formLoading, isBusinessEmailValid, isEmailValid, isPasswordValid]
     );
 
     async function handleSubmit(e: React.FormEvent) {
@@ -79,6 +80,9 @@ export default function SigninPage() {
                         Sign in to monitor how AI systems describe your brand, compare competitors, and act on
                         visibility gaps with confidence.
                     </p>
+                    <p className="mt-2 text-xs font-medium text-amber-700">
+                        Sign in with your business email.
+                    </p>
 
                     {submitError && (
                         <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
@@ -95,7 +99,7 @@ export default function SigninPage() {
                         className="mt-5 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border bg-white py-2.5 text-sm font-medium text-[#171717] transition hover:bg-gray-50 disabled:opacity-70"
                     >
                         <Image src="/google.png" unoptimized alt="Google" width={16} height={16} />
-                        Sign in with Google
+                        Sign in with Google (work email)
                         <span>{googleLoading && <Loading />}</span>
                     </button>
 
@@ -116,6 +120,11 @@ export default function SigninPage() {
                             />
                             {emailTouched && !isEmailValid && (
                                 <p className="mt-1 text-xs text-red-600">Enter a valid email address.</p>
+                            )}
+                            {emailTouched && isEmailValid && !isBusinessEmailValid && (
+                                <p className="mt-1 text-xs text-red-600">
+                                    Please use your business email address, not a personal inbox like Gmail.
+                                </p>
                             )}
                         </div>
 
