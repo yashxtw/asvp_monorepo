@@ -1,15 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-
-function setFrontendSessionCookie(res: NextResponse, req: NextRequest, token: string) {
-    const isSecure = req.nextUrl.protocol === "https:";
-
-    res.cookies.set("auth_token", token, {
-        httpOnly: true,
-        sameSite: "lax",
-        secure: isSecure,
-        path: "/",
-    });
-}
+import { setFrontendSessionCookie } from "../_utils";
 
 export async function POST(req: NextRequest) {
     const body = await req.json().catch(() => null);

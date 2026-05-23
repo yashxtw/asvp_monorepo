@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { setFrontendSessionCookie } from "../_utils";
 
 export async function GET(req: NextRequest) {
     const token = req.nextUrl.searchParams.get("token");
@@ -11,14 +12,7 @@ export async function GET(req: NextRequest) {
         new URL("/dashboard", req.url)
     );
 
-    const isSecure = req.nextUrl.protocol === "https:";
-
-    res.cookies.set("auth_token", token, {
-        httpOnly: true,
-        sameSite: "lax",
-        secure: isSecure,
-        path: "/",
-    });
+    setFrontendSessionCookie(res, req, token);
 
     return res;
 }

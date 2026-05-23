@@ -2,8 +2,6 @@
 
 import api from "./axios";
 
-const BACKEND_API_BASE = process.env.NEXT_PUBLIC_API_BASE!;
-
 export class AuthRequestError extends Error {
     status: number;
     code?: string;
@@ -18,23 +16,8 @@ export class AuthRequestError extends Error {
     }
 }
 
-async function establishFrontendSession(token: string) {
-    const res = await fetch("/api/auth/session", {
-        method: "POST",
-        credentials: "include",
-        headers: {
-            "content-type": "application/json",
-        },
-        body: JSON.stringify({ token }),
-    });
-
-    if (!res.ok) {
-        throw new Error("Failed to establish frontend session");
-    }
-}
-
 async function authRequest<T>(path: string, body: Record<string, unknown>) {
-    const res = await fetch(`${BACKEND_API_BASE}${path}`, {
+    const res = await fetch(path, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -77,12 +60,10 @@ export function loginWithGoogle() {
 }
 
 export async function signInWithEmail(email: string, password: string) {
-    const json = await authRequest<{ token: string }>("/auth/signin", {
+    const json = await authRequest<{ token: string }>("/api/auth/signin", {
         email,
         password,
     });
-
-    await establishFrontendSession(json.token);
     return json;
 }
 
@@ -94,24 +75,21 @@ export async function signUpWithEmail(payload: {
     confirmPassword: string;
 }) {
     const json = await authRequest<{ success: boolean; requiresEmailVerification: boolean; email: string; message: string }>(
-        "/auth/signup",
+        "/api/auth/signup",
         payload
     );
     return json;
 }
 
 export async function requestPasswordReset(email: string) {
-    return authRequest<{ success: boolean; message: string }>("/auth/forgot-password", { email });
+    return authRequest<{ success: boolean; message: string }>("/api/auth/forgot-password", { email });
 }
 
 export async function validateResetToken(token: string) {
-    const res = await fetch(
-        `${BACKEND_API_BASE}/auth/reset-password/validate?token=${encodeURIComponent(token)}`,
-        {
-            method: "GET",
-            credentials: "include",
-        }
-    );
+    const res = await fetch(`/api/auth/reset-password/validate?token=${encodeURIComponent(token)}`, {
+        method: "GET",
+        credentials: "include",
+    });
 
     const json = await res.json().catch(() => ({}));
 
@@ -130,27 +108,20 @@ export async function resetPassword(payload: {
     const json = await authRequest<
         | { token: string }
         | { success: boolean; requiresEmailVerification: boolean; message: string; email: string }
-    >("/auth/reset-password", payload);
-
-    if ("token" in json) {
-        await establishFrontendSession(json.token);
-    }
+    >("/api/auth/reset-password", payload);
 
     return json;
 }
 
 export async function resendVerificationEmail(email: string) {
-    return authRequest<{ success: boolean; message: string }>("/auth/resend-verification", { email });
+    return authRequest<{ success: boolean; message: string }>("/api/auth/resend-verification", { email });
 }
 
 export async function validateEmailVerificationToken(token: string) {
-    const res = await fetch(
-        `${BACKEND_API_BASE}/auth/verify-email/validate?token=${encodeURIComponent(token)}`,
-        {
-            method: "GET",
-            credentials: "include",
-        }
-    );
+    const res = await fetch(`/api/auth/verify-email/validate?token=${encodeURIComponent(token)}`, {
+        method: "GET",
+        credentials: "include",
+    });
 
     const json = await res.json().catch(() => ({}));
 
@@ -162,8 +133,7 @@ export async function validateEmailVerificationToken(token: string) {
 }
 
 export async function verifyEmail(token: string) {
-    const json = await authRequest<{ token: string }>("/auth/verify-email", { token });
-    await establishFrontendSession(json.token);
+    const json = await authRequest<{ token: string }>("/api/auth/verify-email", { token });
     return json;
 }
 
