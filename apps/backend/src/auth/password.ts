@@ -7,6 +7,33 @@ export function normalizeEmail(email: string) {
     return email.trim().toLowerCase();
 }
 
+const PERSONAL_EMAIL_DOMAINS = new Set([
+    "gmail.com",
+    "googlemail.com",
+    "yahoo.com",
+    "outlook.com",
+    "hotmail.com",
+    "live.com",
+    "icloud.com",
+    "aol.com",
+    "proton.me",
+    "protonmail.com",
+]);
+
+export function getEmailDomain(email: string) {
+    const normalized = normalizeEmail(email);
+    return normalized.split("@")[1] || "";
+}
+
+export function isBusinessEmail(email: string) {
+    const domain = getEmailDomain(email);
+    if (!domain) {
+        return false;
+    }
+
+    return !PERSONAL_EMAIL_DOMAINS.has(domain);
+}
+
 export function validatePassword(password: string) {
     const checks = {
         minLength: password.length >= 8,

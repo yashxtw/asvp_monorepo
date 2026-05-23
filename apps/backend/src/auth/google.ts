@@ -3,7 +3,7 @@ import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { db } from "../db/client";
 import path from "path";
 import dotenv from "dotenv";
-import { normalizeEmail } from "./password";
+import { getEmailDomain, isBusinessEmail, normalizeEmail } from "./password";
 
 dotenv.config({
     path: path.resolve(__dirname, "../../../../.env"),
@@ -20,6 +20,9 @@ passport.use(
         try {
             const email = normalizeEmail(profile.emails?.[0].value || "");
             if (!email) return done(new Error("No email"));
+            if (!isBusinessEmail(email)) {
+                return done(new Error("Please use a business email address"));
+            }
 
             const existingUserResult = await db.query(
             `
@@ -54,7 +57,7 @@ passport.use(
             }
 
             // find or create customer
-            const domain = email.split("@")[1];
+            const domain = getEmailDomain(email);
 
             const customerResult = await db.query(
             `

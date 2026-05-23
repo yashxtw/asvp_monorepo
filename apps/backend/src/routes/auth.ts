@@ -10,6 +10,7 @@ import { signJWT } from "../auth/jwt";
 import { getAuthCookieOptions } from "../auth/cookies";
 import {
     createResetToken,
+    isBusinessEmail,
     hashPassword,
     hashResetToken,
     normalizeEmail,
@@ -26,6 +27,10 @@ const router = Router();
 
 function isValidEmail(email: string) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function ensureBusinessEmail(email: string) {
+    return isBusinessEmail(email);
 }
 
 async function isEmailAllowed(email: string) {
@@ -189,6 +194,10 @@ router.post("/signup", async (req, res) => {
         return res.status(400).json({ error: "Please enter a valid email address" });
     }
 
+    if (!ensureBusinessEmail(normalizedEmail)) {
+        return res.status(400).json({ error: "Please use your business email address" });
+    }
+
     if (password !== confirmPassword) {
         return res.status(400).json({ error: "Passwords do not match" });
     }
@@ -289,6 +298,10 @@ router.post("/signin", async (req, res) => {
         return res.status(400).json({ error: "Please enter a valid email address" });
     }
 
+    if (!ensureBusinessEmail(normalizedEmail)) {
+        return res.status(400).json({ error: "Please use your business email address" });
+    }
+
     try {
         const userRes = await db.query(
             `
@@ -370,6 +383,10 @@ router.post("/forgot-password", async (req, res) => {
         return res.status(400).json({ error: "Please enter a valid email address" });
     }
 
+    if (!ensureBusinessEmail(normalizedEmail)) {
+        return res.status(400).json({ error: "Please use your business email address" });
+    }
+
     try {
         const userRes = await db.query(
             `
@@ -418,6 +435,10 @@ router.post("/resend-verification", async (req, res) => {
 
     if (!normalizedEmail || !isValidEmail(normalizedEmail)) {
         return res.status(400).json({ error: "Please enter a valid email address" });
+    }
+
+    if (!ensureBusinessEmail(normalizedEmail)) {
+        return res.status(400).json({ error: "Please use your business email address" });
     }
 
     try {
