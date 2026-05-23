@@ -3,10 +3,14 @@ import { proxyBackendAuthRequest, setFrontendSessionCookie } from "../_utils";
 
 export async function POST(req: NextRequest) {
     const body = await req.text();
-    const { backendResponse, json } = await proxyBackendAuthRequest(req, "/auth/signin", {
+    const { backendResponse, json, errorResponse } = await proxyBackendAuthRequest(req, "/auth/signin", {
         method: "POST",
         body,
     });
+
+    if (errorResponse || !backendResponse) {
+        return errorResponse ?? NextResponse.json({ error: "Failed to sign in" }, { status: 500 });
+    }
 
     if (!backendResponse.ok) {
         return NextResponse.json(json || { error: "Failed to sign in" }, { status: backendResponse.status });

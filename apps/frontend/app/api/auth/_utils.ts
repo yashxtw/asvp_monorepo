@@ -11,6 +11,13 @@ export function setFrontendSessionCookie(res: NextResponse, req: NextRequest, to
     });
 }
 
+type ProxyBackendAuthResult = {
+    backendResponse: Response | null;
+    json: any;
+    text: string;
+    errorResponse?: NextResponse;
+};
+
 export async function proxyBackendAuthRequest(
     req: NextRequest,
     backendPath: string,
@@ -22,7 +29,15 @@ export async function proxyBackendAuthRequest(
     const backendBase = process.env.NEXT_PUBLIC_API_BASE;
 
     if (!backendBase) {
-        return NextResponse.json({ error: "Backend API base URL is not configured" }, { status: 500 });
+        return {
+            backendResponse: null,
+            json: null,
+            text: "",
+            errorResponse: NextResponse.json(
+                { error: "Backend API base URL is not configured" },
+                { status: 500 }
+            ),
+        } satisfies ProxyBackendAuthResult;
     }
 
     const res = await fetch(`${backendBase}${backendPath}`, {
@@ -45,5 +60,9 @@ export async function proxyBackendAuthRequest(
         json = null;
     }
 
-    return { backendResponse: res, json, text };
+    return {
+        backendResponse: res,
+        json,
+        text,
+    } satisfies ProxyBackendAuthResult;
 }

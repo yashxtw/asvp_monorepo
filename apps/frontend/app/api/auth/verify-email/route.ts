@@ -3,10 +3,14 @@ import { proxyBackendAuthRequest, setFrontendSessionCookie } from "../_utils";
 
 export async function POST(req: NextRequest) {
     const body = await req.text();
-    const { backendResponse, json } = await proxyBackendAuthRequest(req, "/auth/verify-email", {
+    const { backendResponse, json, errorResponse } = await proxyBackendAuthRequest(req, "/auth/verify-email", {
         method: "POST",
         body,
     });
+
+    if (errorResponse || !backendResponse) {
+        return errorResponse ?? NextResponse.json({ error: "Failed to verify email" }, { status: 500 });
+    }
 
     if (!backendResponse.ok) {
         return NextResponse.json(json || { error: "Failed to verify email" }, { status: backendResponse.status });
