@@ -10,11 +10,53 @@ dotenv.config({
 
 const router = Router();
 
-router.get("/slots", async (req, res) => {
+async function notifyOwnerAboutAccessRequest({
+    name,
+    email,
+    isWaitlisted,
+}: {
+    name: string;
+    email: string;
+    isWaitlisted: boolean;
+}) {
+    const accessKey = process.env.WEB3FORMS_ACCESS_KEY;
+
+    if (!accessKey) {
+        console.warn("WEB3FORMS_ACCESS_KEY is not configured. Skipping owner notification.");
+        return;
+    }
+
+    const payload = {
+        access_key: accessKey,
+        subject: "New VerityAI access request",
+        name,
+        email,
+        message: [
+            "A new user requested access to VerityAI.",
+            `Name: ${name}`,
+            `Email: ${email}`,
+            `Status: ${isWaitlisted ? "Waitlisted" : "Pending review / slots available"}`,
+        ].join("\n"),
+    };
+
+    const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+        },
+        body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+        const text = await response.text().catch(() => "");
+        throw new Error(`Web3Forms request failed with ${response.status}: ${text}`);
+    }
+}
+
+router.get("/slots", async (_req, res) => {
     try {
-        const result = await db.query(
-            `SELECT COUNT(*) FROM allowed_emails WHERE is_active = true`
-        );
+        const result = await db.query(`SELECT COUNT(*) FROM allowed_emails WHERE is_active = true`);
 
         const activeCount = Number(result.rows[0].count);
         const maxSlots = Number(process.env.MAX_SLOTS || 10);
@@ -24,30 +66,29 @@ router.get("/slots", async (req, res) => {
             remainingSlots,
             isFull: remainingSlots === 0,
         });
-    } catch (error) {
+    } catch {
         res.status(500).json({ error: "Server error" });
     }
 });
 
 router.post("/request-access", async (req, res) => {
     try {
-        const { name, email } = req.body;
+        const { name, email } = req.body as { name?: string; email?: string };
 
         if (!name || !email) {
             return res.status(400).json({ error: "Missing fields" });
         }
 
-        // Always insert as inactive (waitlist by default)
         await db.query(
-            `INSERT INTO allowed_emails (email, is_active)
+            `
+            INSERT INTO allowed_emails (email, is_active)
             VALUES ($1, false)
-            ON CONFLICT (email) DO NOTHING`,
+            ON CONFLICT (email) DO NOTHING
+            `,
             [email]
         );
 
-        const countResult = await db.query(
-            `SELECT COUNT(*) FROM allowed_emails WHERE is_active = true`
-        );
+        const countResult = await db.query(`SELECT COUNT(*) FROM allowed_emails WHERE is_active = true`);
 
         const activeCount = Number(countResult.rows[0].count);
         const maxSlots = Number(process.env.MAX_SLOTS || 10);
@@ -60,53 +101,53 @@ router.post("/request-access", async (req, res) => {
 
             emailHtml = `
                 <div style="font-family: Arial, sans-serif; line-height: 1.6;">
-                <h2>You're on the waitlist 🚀</h2>
-                <p>Hi ${name},</p>
-                <p>
-                Thanks for your interest in <strong>VerityAI</strong>.
-                We're currently operating in private beta with a limited number of early users.
-                </p>
-                <p>
-                All available slots are currently filled, but we've successfully added you to our priority waitlist.
-                </p>
-                <p>
-                The moment a slot becomes available, you'll receive an email from us with access details.
-                </p>
-                <p style="margin-top: 24px;">
-                We appreciate your patience — exciting things are coming.
-                </p>
-                <p style="margin-top: 16px;">
-                — VerityAI Team
-                </p>
-            </div>
+                    <h2>You're on the waitlist</h2>
+                    <p>Hi ${name},</p>
+                    <p>
+                        Thanks for your interest in <strong>VerityAI</strong>.
+                        We're currently operating in private beta with a limited number of early users.
+                    </p>
+                    <p>
+                        All available slots are currently filled, but we've successfully added you to our priority waitlist.
+                    </p>
+                    <p>
+                        The moment a slot becomes available, you'll receive an email from us with access details.
+                    </p>
+                    <p style="margin-top: 24px;">
+                        We appreciate your patience. Exciting things are coming.
+                    </p>
+                    <p style="margin-top: 16px;">
+                        - VerityAI Team
+                    </p>
+                </div>
             `;
         } else {
             emailHtml = `
                 <div style="font-family: Arial, sans-serif; line-height: 1.6;">
-                <h2>Thanks for requesting access 👋</h2>
-                <p>Hi ${name},</p>
-                <p>
-                Thank you for your interest in <strong>VerityAI</strong>.
-                We’re currently onboarding a limited number of early users as part of our private beta.
-                </p>
-                <p>
-                Our team will review your request and get back to you within <strong>24 hours</strong>.
-                You’ll receive an email notification once your access has been approved.
-                </p>
-                <p style="margin-top: 24px;">
-                We’re excited to have you on board.
-                </p>
-                <p style="margin-top: 16px;">
-                — VerityAI Team
-                </p>
-            </div>
+                    <h2>Thanks for requesting access</h2>
+                    <p>Hi ${name},</p>
+                    <p>
+                        Thank you for your interest in <strong>VerityAI</strong>.
+                        We're currently onboarding a limited number of early users as part of our private beta.
+                    </p>
+                    <p>
+                        Our team will review your request and get back to you within <strong>24 hours</strong>.
+                        You'll receive an email notification once your access has been approved.
+                    </p>
+                    <p style="margin-top: 24px;">
+                        We're excited to have you on board.
+                    </p>
+                    <p style="margin-top: 16px;">
+                        - VerityAI Team
+                    </p>
+                </div>
             `;
         }
 
         const emailResponse = await resend.emails.send({
             from: process.env.FROM_EMAIL!,
             to: email,
-            subject: "VerityAI – Access Request Received",
+            subject: "VerityAI - Access Request Received",
             html: emailHtml,
         });
 
@@ -115,17 +156,22 @@ router.post("/request-access", async (req, res) => {
             return res.status(500).json({ error: "Email failed" });
         }
 
+        notifyOwnerAboutAccessRequest({
+            name,
+            email,
+            isWaitlisted,
+        }).catch((error) => {
+            console.error("Failed to notify owner about access request:", error);
+        });
+
         return res.status(200).json({
             success: true,
             waitlisted: isWaitlisted,
         });
-
     } catch (error) {
         console.error(error);
         return res.status(500).json({ error: "Server error" });
     }
 });
 
-
 export default router;
-
