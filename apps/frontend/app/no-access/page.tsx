@@ -8,7 +8,7 @@ export default function NoAccessPage() {
     const [isFull, setIsFull] = useState(false);
 
     useEffect(() => {
-        fetch(`${process.env.NEXT_PUBLIC_API_BASE}/no-access/slots`)
+        fetch("/api/no-access/slots")
             .then((res) => res.json())
             .then((data) => {
                 setSlots(data.remainingSlots);
@@ -39,7 +39,7 @@ export default function NoAccessPage() {
         setResultMessage("");
 
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/no-access/request-access`, {
+            const response = await fetch("/api/no-access/request-access", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData),
