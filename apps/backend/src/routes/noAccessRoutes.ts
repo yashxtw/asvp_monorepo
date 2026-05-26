@@ -19,38 +19,34 @@ async function notifyOwnerAboutAccessRequest({
     email: string;
     isWaitlisted: boolean;
 }) {
-    const accessKey = process.env.WEB3FORMS_ACCESS_KEY;
+    const ownerEmail = process.env.ACCESS_REQUEST_OWNER_EMAIL;
 
-    if (!accessKey) {
-        console.warn("WEB3FORMS_ACCESS_KEY is not configured. Skipping owner notification.");
+    if (!ownerEmail) {
+        console.warn("ACCESS_REQUEST_OWNER_EMAIL is not configured. Skipping owner notification.");
         return;
     }
 
-    const payload = {
-        access_key: accessKey,
+    const response = await resend.emails.send({
+        from: process.env.FROM_EMAIL!,
+        to: ownerEmail,
         subject: "New VerityAI access request",
-        name,
-        email,
-        message: [
-            "A new user requested access to VerityAI.",
-            `Name: ${name}`,
-            `Email: ${email}`,
-            `Status: ${isWaitlisted ? "Waitlisted" : "Pending review / slots available"}`,
-        ].join("\n"),
-    };
-
-    const response = await fetch("https://api.web3forms.com/submit", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-        },
-        body: JSON.stringify(payload),
+        replyTo: email,
+        html: `
+            <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #171717;">
+                <h2>New access request</h2>
+                <p>Someone requested access to VerityAI.</p>
+                <p><strong>Name:</strong> ${name}</p>
+                <p><strong>Email:</strong> ${email}</p>
+                <p><strong>Status:</strong> ${
+                    isWaitlisted ? "Waitlisted" : "Pending review / slots available"
+                }</p>
+                <p>You can reply directly to this email to contact the requester.</p>
+            </div>
+        `,
     });
 
-    if (!response.ok) {
-        const text = await response.text().catch(() => "");
-        throw new Error(`Web3Forms request failed with ${response.status}: ${text}`);
+    if (response.error) {
+        throw new Error(response.error.message || "Failed to send owner notification");
     }
 }
 
