@@ -34,9 +34,12 @@ body {
 
 /* Disable text selection */
 .no-select {
-  -webkit-user-select: none; /* Safari */
-  -ms-user-select: none;     /* IE 10+ */
-  user-select: none;         /* Standard */
+  -webkit-user-select: none;
+  /* Safari */
+  -ms-user-select: none;
+  /* IE 10+ */
+  user-select: none;
+  /* Standard */
 }
 
 
@@ -100,6 +103,7 @@ body {
   0% {
     transform: translateX(0%);
   }
+
   100% {
     transform: translateX(-50%);
   }
@@ -109,6 +113,7 @@ body {
   0% {
     transform: translateX(-50%);
   }
+
   100% {
     transform: translateX(0%);
   }
@@ -126,6 +131,7 @@ body {
   0% {
     background-position: 0%;
   }
+
   100% {
     background-position: 200%;
   }

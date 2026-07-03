@@ -25,14 +25,14 @@ function NavLink({
 export default function Header() {
     const router = useRouter();
     return (
-        <header className="w-full border-b bg-white/20 backdrop-blur-md fixed top-0 z-50">
-            <div className="mx-auto max-w-7xl px-6 md:px-20 py-4 flex items-center justify-between">
+        <header className="w-full fixed top-0 z-50 px-6 md:px-20 pt-2">
+            <div className="mx-auto rounded-2xl backdrop-blur-sm max-w-7xl px-2 py-2 flex items-center justify-between">
 
                 <Link href="/" className="flex items-center gap-2">
                     <div className="h-10 w-10 flex items-center justify-center">
-                        <Image src="/logo_black.png" alt="Logo" width={50} height={50} />
+                        <Image src="/logo_white.png" alt="Logo" width={50} height={50} />
                     </div>
-                    <span className="text-xl md:text-2xl font-bold text-[#171717] tracking-tight">
+                    <span className="text-xl md:text-2xl text-white/90 font-bold tracking-tight">
                         VerityAI
                     </span>
                 </Link>
@@ -40,14 +40,14 @@ export default function Header() {
                 <div className="flex items-center gap-4">
                     <Link
                         href="/signin"
-                        className="text-sm font-medium text-gray-700 hover:text-black transition"
+                        className="text-sm font-medium text-white/90 hover:text-black transition"
                     >
                         Sign in
                     </Link>
 
                     <Button
                         onClick={() => router.push("/dashboard")}
-                        className="rounded-lg cursor-pointer bg-black px-5 py-2 text-sm font-semibold text-white transition"
+                        className="rounded-lg cursor-pointer bg-white/90 px-5 py-2 text-sm font-semibold text-black transition"
                     >
                         Dashboard
                     </Button>

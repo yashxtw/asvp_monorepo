@@ -39,13 +39,6 @@ ALTER TABLE queries ADD COLUMN deleted_at TIMESTAMP DEFAULT NULL;
 
 
 
--- ALTER TABLE queries ENABLE ROW LEVEL SECURITY;
-
--- CREATE POLICY queries_isolation
--- ON queries
--- USING (customer_id::text = current_setting('app.customer_id', true))
--- WITH CHECK (customer_id::text = current_setting('app.customer_id', true));
-
 
 
 

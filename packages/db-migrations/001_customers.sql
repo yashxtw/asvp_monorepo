@@ -17,10 +17,8 @@ ADD COLUMN IF NOT EXISTS razorpay_customer_id TEXT,
 ADD COLUMN IF NOT EXISTS razorpay_subscription_id TEXT,
 ADD COLUMN IF NOT EXISTS billing_status TEXT DEFAULT 'inactive';
 
-
-
--- ALTER TABLE customers ENABLE ROW LEVEL SECURITY;
-
--- CREATE POLICY customers_self
--- ON customers
--- USING (id::text = current_setting('app.customer_id', true));
+ALTER TABLE customers
+ADD COLUMN IF NOT EXISTS plan_started_at TIMESTAMPTZ,
+ADD COLUMN IF NOT EXISTS plan_expires_at TIMESTAMPTZ,
+ADD COLUMN IF NOT EXISTS razorpay_payment_link_id TEXT,
+ADD COLUMN IF NOT EXISTS razorpay_payment_id TEXT;

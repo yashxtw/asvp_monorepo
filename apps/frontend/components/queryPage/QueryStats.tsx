@@ -82,7 +82,7 @@ export default function KPIGrid({
             {/* Add Query Modal */}
             {showAddQuery && (
                 <div className="fixed inset-0 bg-black/40 h-screen flex items-center justify-center z-50">
-                    <div className="bg-white rounded-xl p-6 w-125 relative">
+                    <div className="bg-white mx-2 rounded-xl p-6 w-125 relative">
 
                         <button
                             onClick={() => setShowAddQuery(false)}

@@ -14,11 +14,3 @@ ALTER TABLE brands
 ADD COLUMN description TEXT,
 ADD COLUMN logo_url TEXT,
 ADD COLUMN competitors TEXT[] default '{}';
-
-
--- ALTER TABLE brands ENABLE ROW LEVEL SECURITY;
-
--- CREATE POLICY brands_isolation
--- ON brands
--- USING (customer_id::text = current_setting('app.customer_id', true))
--- WITH CHECK (customer_id::text = current_setting('app.customer_id', true));

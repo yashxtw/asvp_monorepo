@@ -1,6 +1,6 @@
 import Header from "@/components/landingPage/header";
 import Hero from "@/components/landingPage/hero";
-import GridCard from "@/components/landingPage/GridCard";
+import DashboardPreview from "@/components/landingPage/DashboardPreview";
 import PricingSection from "@/components/landingPage/SubscriptionPlans";
 import Footer from "@/components/landingPage/Footer";
 import BottomCTA from "@/components/landingPage/BottomCTA";
@@ -17,6 +17,7 @@ export default async function Page() {
       <Header />
       <main>
         <Hero />
+        <DashboardPreview />
         <PartnersSection />
         <BenefitsSection />
         <DemoSection />

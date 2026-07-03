@@ -38,6 +38,20 @@ ON runs(query_id, created_at DESC);
 CREATE INDEX idx_runs_query_time
 ON runs(query_id, started_at DESC);
 
+ALTER TABLE runs
+ADD COLUMN IF NOT EXISTS execution_group_id UUID,
+ADD COLUMN IF NOT EXISTS trigger_type TEXT DEFAULT 'scheduled';
+
+UPDATE runs
+SET execution_group_id = id
+WHERE execution_group_id IS NULL;
+
+CREATE INDEX IF NOT EXISTS idx_runs_execution_group
+ON runs (execution_group_id);
+
+CREATE INDEX IF NOT EXISTS idx_runs_query_execution_group
+ON runs (query_id, execution_group_id);
+
 
 
 -- ALTER TABLE runs ENABLE ROW LEVEL SECURITY;

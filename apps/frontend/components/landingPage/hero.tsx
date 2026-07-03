@@ -1,8 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { cn } from "@/lib/utils";
-import { InteractiveGridPattern } from "../ui/magic/interactive-grid-pattern";
+import Image from "next/image";
 
 const highlights = [
     "Track the same query across ChatGPT, Gemini, Claude, and Google AI Overviews.",
@@ -15,38 +14,43 @@ export default function Hero() {
     const router = useRouter();
 
     return (
-        <section className="relative overflow-hidden text-[#171717]">
-            <InteractiveGridPattern
-                className={cn(
-                    "mask-[radial-gradient(400px_circle_at_center,white,transparent)]",
-                    "inset-x-0 inset-y-[-30%] h-[130%] skew-y-12 -z-10"
-                )}
+        <section className="relative min-h-screen w-full overflow-hidden">
+            {/* ── Background image ── */}
+            <Image
+                src="/hero.jpg"
+                alt="Hero background"
+                fill
+                priority
+                className="object-cover"
             />
 
-            <div className="max-w-6xl mx-auto px-6 z-10 pt-28 pb-10 text-center">
-                {/* <div className="inline-block mb-6 px-4 py-2 text-sm font-medium text-black rounded-lg">
-                    AI Search Visibility Platform <span className="font-semibold bg-[#1E3A8A] text-white px-2 py-1 rounded-lg">for brands that want clarity</span>
-                </div> */}
+            {/* ── Gradient overlays ── */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/50" />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-transparent" />
+            {/* Bottom fade to solid black — merges with DashboardPreview */}
+            <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-b from-transparent to-black" />
 
+            {/* ── Content (same as original, overlaid on image) ── */}
+            <div className="relative z-10 max-w-6xl mx-auto px-6 pt-28 pb-16 text-center min-h-screen flex flex-col justify-center">
 
                 <div className="grid grid-cols-1 md:grid-cols-2 mb-8">
-                    <div className="inline-block md:text-right px-2 py-1 text-sm font-medium text-black rounded-lg">
+                    <div className="inline-block md:text-right px-2 py-1 text-sm font-medium text-white/80 rounded-lg">
                         AI Search Visibility Platform
                     </div>
-                    <div className="inline-block md:text-left px-2 py-1 text-sm font-medium text-black rounded-lg">
-                        <span className="font-semibold bg-[#1E3A8A] text-white px-2 py-1 rounded-lg">
+                    <div className="inline-block md:text-left px-2 py-1 text-sm font-medium text-white rounded-lg">
+                        <span className="font-semibold bg-white/20 backdrop-blur-sm text-white px-2 py-1 rounded-lg">
                             for brands that want clarity.
                         </span>
                     </div>
                 </div>
 
-                <h1 className="text-5xl sm:text-6xl md:text-7xl font-extrabold leading-tight tracking-tight">
-                    <span className="text-[#1E3A8A]">If AI answers shape discovery,</span>
+                <h1 className="text-5xl sm:text-6xl md:text-7xl font-extrabold leading-tight tracking-tight text-white">
+                    <span className="text-white/90">If AI answers shape discovery,</span>
                     <br />
                     your brand needs to be part of the answer.
                 </h1>
 
-                <p className="mt-8 max-w-3xl mx-auto text-lg sm:text-xl text-zinc-700 leading-relaxed">
+                <p className="mt-8 max-w-3xl mx-auto text-lg sm:text-xl text-white/70 leading-relaxed">
                     VerityAI shows how AI systems describe your brand, where competitors win, and what to improve next.
                 </p>
 
@@ -54,7 +58,7 @@ export default function Hero() {
                     {highlights.map((item) => (
                         <div
                             key={item}
-                            className="rounded-2xl border-t border-[#1E3A8A] shadow-sm shadow-[#1E3A8A]/20 bg-white/85 px-4 py-3 text-sm text-zinc-700 "
+                            className="rounded-2xl border-t border-white/20 shadow-sm bg-white/10 backdrop-blur-md px-4 py-3 text-sm text-white/80"
                         >
                             {item}
                         </div>
@@ -64,7 +68,7 @@ export default function Hero() {
                 <div className="mt-12 flex justify-center gap-4">
                     <button
                         onClick={() => router.push("/dashboard")}
-                        className="rounded-xl bg-black cursor-pointer px-4 py-2 font-semibold text-white shadow-lg transition-all duration-300 hover:shadow-xl"
+                        className="rounded-xl bg-white cursor-pointer px-4 py-2 font-semibold text-black shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-[1.02]"
                     >
                         Start Monitoring
                     </button>
@@ -73,7 +77,7 @@ export default function Hero() {
                         onClick={() =>
                             document.getElementById("how-it-works")?.scrollIntoView({ behavior: "smooth" })
                         }
-                        className="rounded-xl border border-zinc-400 px-4 py-2 font-semibold transition-all duration-300 hover:border-zinc-600"
+                        className="rounded-xl border border-white/40 px-4 py-2 font-semibold text-white transition-all duration-300 hover:border-white/70 hover:bg-white/10"
                     >
                         See how it works
                     </button>

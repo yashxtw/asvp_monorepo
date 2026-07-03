@@ -72,7 +72,7 @@ export default function PricingSection() {
                     </h2>
                     <p className="mt-6 text-lg text-zinc-600">
                         Start by understanding the signal, then grow into a proper AI visibility operating system as your
-                    team turns monitoring into action.
+                        team turns monitoring into action.
                     </p>
                 </div>
 
@@ -80,9 +80,8 @@ export default function PricingSection() {
                     {plans.map((plan) => (
                         <Card
                             key={plan.name}
-                            className={`relative rounded-2xl shadow-sm transition-all duration-300 hover:shadow-lg ${
-                                plan.popular ? "scale-105 border-primary shadow-xl" : "border-muted"
-                            }`}
+                            className={`relative rounded-2xl shadow-sm transition-all duration-300 hover:shadow-lg ${plan.popular ? "scale-105 border-primary shadow-xl" : "border-muted"
+                                }`}
                         >
                             {plan.popular && (
                                 <span className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full bg-[#1E3A8A] px-4 py-1 text-xs text-white">

@@ -24,7 +24,6 @@ type brands = {
 };
 
 export default function NewBrandPage() {
-
   const [brands, setBrands] = useState<brands[]>([]);
   const [brandsCount, setBrandsCount] = useState(0);
   const [queryCount, setQueryCount] = useState(0);
@@ -63,7 +62,8 @@ export default function NewBrandPage() {
 
   async function refreshBrands() {
     setBrandsLoading(true);
-    axios.get("/brands")
+    axios
+      .get("/brands")
       .then((res) => {
         setBrands(res.data);
         setBrandsCount(res.data.length);
@@ -184,10 +184,14 @@ export default function NewBrandPage() {
 
   return (
     <main className="pt-28 sm:pt-0 space-y-8">
-
       <div className="">
         <div className="lg:col-span-1">
-          <BrandStats brandsCount={brandsCount} queryCount={queryCount} activeQueryCount={activeQueryCount} refreshBrands={refreshBrands} />
+          <BrandStats
+            brandsCount={brandsCount}
+            queryCount={queryCount}
+            activeQueryCount={activeQueryCount}
+            refreshBrands={refreshBrands}
+          />
         </div>
       </div>
 
@@ -228,7 +232,6 @@ export default function NewBrandPage() {
           onConfirm={confirmDeleteBrand}
         />
       )}
-
     </main>
   );
 }

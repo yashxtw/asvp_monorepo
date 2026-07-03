@@ -11,6 +11,23 @@ CREATE TABLE IF NOT EXISTS users (
     UNIQUE (provider, provider_id)
 );
 
+ALTER TABLE users
+ADD COLUMN IF NOT EXISTS email_verified BOOLEAN NOT NULL DEFAULT true,
+ADD COLUMN IF NOT EXISTS email_verified_at TIMESTAMPTZ,
+ADD COLUMN IF NOT EXISTS email_verification_token_hash TEXT,
+ADD COLUMN IF NOT EXISTS email_verification_expires_at TIMESTAMPTZ;
+
+UPDATE users
+SET email_verified = true
+WHERE email_verified IS DISTINCT FROM true;
+
+ALTER TABLE users
+ADD COLUMN IF NOT EXISTS password_hash TEXT,
+ADD COLUMN IF NOT EXISTS password_reset_token_hash TEXT,
+ADD COLUMN IF NOT EXISTS password_reset_token_expires_at TIMESTAMPTZ,
+ADD COLUMN IF NOT EXISTS last_login_at TIMESTAMPTZ;
+
+
 -- Optional but recommended
 CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email_unique
 ON users(email);
