@@ -25,7 +25,7 @@ export default function DemoWizard() {
     // Initial client-side check of localStorage
     useEffect(() => {
         const count = localStorage.getItem("verity_demo_count");
-        if (count && parseInt(count, 10) >= 10) {
+        if (count && parseInt(count, 10) >= 2) {
             setLimitReached(true);
         }
         setCheckingLimit(false);
@@ -57,15 +57,15 @@ export default function DemoWizard() {
 
     if (checkingLimit) {
         return (
-            <div className="flex h-screen items-center justify-center bg-zinc-950">
-                <div className="h-6 w-6 animate-spin rounded-full border-2 border-white/20 border-t-white" />
+            <div className="flex h-screen items-center justify-center bg-[#FAFAFA]">
+                <div className="h-6 w-6 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-900" />
             </div>
         );
     }
 
     if (limitReached) {
         return (
-            <div className="min-h-screen bg-zinc-950 text-white">
+            <div className="min-h-screen bg-[#FAFAFA] text-zinc-900 md:pl-72">
                 <DemoHeader currentStep={1} totalSteps={TOTAL_STEPS} />
                 <DemoLimitReached />
             </div>
@@ -73,10 +73,10 @@ export default function DemoWizard() {
     }
 
     return (
-        <div className="min-h-screen bg-zinc-950 text-white flex flex-col">
+        <div className="min-h-screen bg-[#FAFAFA] text-zinc-900 flex flex-col md:pl-72">
             <DemoHeader currentStep={step} totalSteps={TOTAL_STEPS} />
             
-            <main className="flex-1 flex items-center justify-center py-10">
+            <main className="flex-1 flex items-center justify-center py-10 px-4 md:px-8">
                 {step === 1 && (
                     <DemoStepBrand onComplete={handleBrandComplete} />
                 )}

@@ -9,11 +9,11 @@ const reviews = [
     },
     {
         name: "###",
-        img: "",
+        img: null,
     },
     {
         name: "###",
-        img: "",
+        img: null,
     },
     {
         name: "Kartavya Technologies",

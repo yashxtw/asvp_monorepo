@@ -58,7 +58,7 @@ router.post("/session", async (req, res) => {
             [ip]
         );
         const ipCount = ipSessionsRes.rows[0].count;
-        if (ipCount >= 10) {
+        if (ipCount >= 2) {
             return res.status(429).json({ error: "demo_limit_reached" });
         }
 

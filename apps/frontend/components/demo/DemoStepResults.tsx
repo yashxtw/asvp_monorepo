@@ -33,7 +33,6 @@ export default function DemoStepResults({ sessionId, onNext }: DemoStepResultsPr
     const [loading, setLoading] = useState(true);
     const [expandedAnswerId, setExpandedAnswerId] = useState<string | null>(null);
 
-    // Poll for results
     useEffect(() => {
         let active = true;
         let attempts = 0;
@@ -78,22 +77,22 @@ export default function DemoStepResults({ sessionId, onNext }: DemoStepResultsPr
     if (loading) {
         return (
             <div className="flex min-h-[40vh] flex-col items-center justify-center text-center gap-3">
-                <Loader2 className="h-8 w-8 animate-spin text-white/50" />
-                <p className="text-sm text-white/60">Fetching latest model evaluations...</p>
+                <Loader2 className="h-6 w-6 animate-spin text-zinc-900" />
+                <p className="text-sm text-zinc-500 font-medium">Fetching engine evaluations...</p>
             </div>
         );
     }
 
     if (results.length === 0) {
         return (
-            <div className="mx-auto max-w-xl text-center px-4 py-8">
-                <div className="rounded-2xl border border-white/[0.08] bg-zinc-900/50 p-8">
-                    <p className="text-sm text-white/60">
-                        No results were generated. This could happen if there was a problem executing queries in Temporal or connector keys are missing.
+            <div className="w-full max-w-xl mx-auto">
+                <div className="p-8 text-center">
+                    <p className="text-sm text-zinc-500 leading-relaxed">
+                        No results were generated. This could be due to missing integration keys or database sync delays.
                     </p>
                     <button
                         onClick={onNext}
-                        className="mt-6 rounded-xl bg-white px-5 py-2.5 text-xs font-semibold text-black hover:bg-white/90"
+                        className="mt-6 rounded-xl bg-zinc-950 px-5 py-2.5 text-xs font-semibold text-white hover:bg-zinc-800 transition"
                     >
                         Skip to Analytics
                     </button>
@@ -103,30 +102,34 @@ export default function DemoStepResults({ sessionId, onNext }: DemoStepResultsPr
     }
 
     return (
-        <div className="mx-auto max-w-4xl px-4 py-8 space-y-8">
+        <div className="w-full max-w-4xl mx-auto space-y-8">
             <div className="text-center">
-                <h2 className="text-xl font-semibold text-white">Step 4: Live Answers Analysis</h2>
-                <p className="mt-1 text-xs text-white/50">
-                    Compare how each model answers your query and cites your brand side-by-side.
+                {/* Minimalist Top Tag */}
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-50 text-[10px] font-bold uppercase tracking-wider text-amber-800 mb-4">
+                    Step 4
+                </div>
+                <h2 className="text-xl font-bold tracking-tight text-zinc-950">Live responses</h2>
+                <p className="mt-1 text-sm text-zinc-500 leading-relaxed">
+                    Compare how each AI engine answers your queries side-by-side.
                 </p>
             </div>
 
             {results.map((group) => (
                 <div
                     key={group.execution_group_id}
-                    className="rounded-2xl border border-white/[0.08] bg-zinc-900/50 p-6 space-y-4 shadow-xl backdrop-blur-md"
+                    className="p-6 md:p-8 space-y-6"
                 >
-                    <div className="border-b border-white/[0.06] pb-3 flex flex-col md:flex-row md:items-center justify-between gap-2">
+                    <div className="border-b border-zinc-100 pb-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
                         <div>
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-white/40">Query</span>
-                            <h3 className="text-base font-semibold text-white mt-0.5">{group.query_text}</h3>
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Query text</span>
+                            <h3 className="text-base font-bold text-zinc-950 mt-0.5">{group.query_text}</h3>
                         </div>
-                        <span className="text-[10px] text-white/40">
-                            Brand: <strong className="text-white/80 font-medium">{group.brand_name}</strong>
+                        <span className="text-xs text-zinc-500 font-semibold bg-zinc-50 border border-zinc-200 px-3 py-1 rounded-lg self-start md:self-auto">
+                            Brand: <strong className="text-zinc-900 font-bold">{group.brand_name}</strong>
                         </span>
                     </div>
 
-                    <div className="grid gap-4 md:grid-cols-2">
+                    <div className="grid gap-6 md:grid-cols-2">
                         {group.answers.map((answer: any) => {
                             const meta = sourceMeta[answer.source_type] || {
                                 label: answer.source_type,
@@ -137,9 +140,9 @@ export default function DemoStepResults({ sessionId, onNext }: DemoStepResultsPr
                             return (
                                 <div
                                     key={answer.id}
-                                    className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 flex flex-col justify-between"
+                                    className="rounded-xl border border-zinc-200 bg-zinc-50/50 p-5 flex flex-col justify-between"
                                 >
-                                    <div className="space-y-3">
+                                    <div className="space-y-4">
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-2">
                                                 {meta.favicon && (
@@ -149,15 +152,15 @@ export default function DemoStepResults({ sessionId, onNext }: DemoStepResultsPr
                                                         className="h-4 w-4 object-contain"
                                                     />
                                                 )}
-                                                <span className="text-xs font-semibold text-white/90">
+                                                <span className="text-xs font-bold text-zinc-900">
                                                     {meta.label}
                                                 </span>
                                             </div>
                                             <span
-                                                className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
+                                                className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
                                                     answer.mentions_brand
-                                                        ? "bg-green-500/10 text-green-400 border border-green-500/20"
-                                                        : "bg-white/10 text-white/60"
+                                                        ? "bg-green-50 text-green-700 border border-green-200"
+                                                        : "bg-zinc-100 text-zinc-500 border border-zinc-200"
                                                 }`}
                                             >
                                                 {answer.mentions_brand ? "Mentioned" : "Not Mentioned"}
@@ -166,34 +169,34 @@ export default function DemoStepResults({ sessionId, onNext }: DemoStepResultsPr
 
                                         {/* Metrics row */}
                                         <div className="grid grid-cols-3 gap-2">
-                                            <div className="rounded-lg bg-white/[0.02] border border-white/[0.04] p-1.5 text-center">
-                                                <span className="text-[9px] uppercase tracking-wider text-white/40">Visibility</span>
-                                                <p className="text-xs font-bold text-white mt-0.5">{answer.visibility_score ?? 0}</p>
+                                            <div className="rounded-lg bg-white border border-zinc-200/80 p-2 text-center shadow-sm">
+                                                <span className="text-[9px] uppercase tracking-wider text-zinc-400 font-bold">Visibility</span>
+                                                <p className="text-sm font-extrabold text-zinc-900 mt-0.5">{answer.visibility_score ?? 0}</p>
                                             </div>
-                                            <div className="rounded-lg bg-white/[0.02] border border-white/[0.04] p-1.5 text-center">
-                                                <span className="text-[9px] uppercase tracking-wider text-white/40">Sentiment</span>
-                                                <p className="text-xs font-bold text-white mt-0.5 capitalize">{answer.sentiment_label || "neutral"}</p>
+                                            <div className="rounded-lg bg-white border border-zinc-200/80 p-2 text-center shadow-sm">
+                                                <span className="text-[9px] uppercase tracking-wider text-zinc-400 font-bold">Sentiment</span>
+                                                <p className="text-xs font-bold text-zinc-900 mt-0.5 capitalize">{answer.sentiment_label || "neutral"}</p>
                                             </div>
-                                            <div className="rounded-lg bg-white/[0.02] border border-white/[0.04] p-1.5 text-center">
-                                                <span className="text-[9px] uppercase tracking-wider text-white/40">Prominence</span>
-                                                <p className="text-xs font-bold text-white mt-0.5">{answer.prominence_score ?? 0}</p>
+                                            <div className="rounded-lg bg-white border border-zinc-200/80 p-2 text-center shadow-sm">
+                                                <span className="text-[9px] uppercase tracking-wider text-zinc-400 font-bold">Prominence</span>
+                                                <p className="text-sm font-extrabold text-zinc-900 mt-0.5">{answer.prominence_score ?? 0}</p>
                                             </div>
                                         </div>
 
                                         {/* Main snippet */}
-                                        <div>
-                                            <span className="text-[9px] uppercase tracking-wider text-white/40">Key Citation Snippet</span>
-                                            <p className="text-xs font-medium text-white/80 leading-relaxed mt-1 bg-white/[0.01] border border-white/[0.03] p-2 rounded-lg italic">
+                                        <div className="space-y-1">
+                                            <span className="text-[9px] uppercase tracking-wider text-zinc-400 font-bold">Key Citation Snippet</span>
+                                            <p className="text-xs font-medium text-zinc-700 leading-relaxed bg-white border border-zinc-150 p-3 rounded-lg italic shadow-sm">
                                                 &ldquo;{answer.main_snippet || "No brand citation snippet found."}&rdquo;
                                             </p>
                                         </div>
                                     </div>
 
                                     {/* Collapsible raw text */}
-                                    <div className="mt-4 pt-3 border-t border-white/[0.04]">
+                                    <div className="mt-4 pt-3 border-t border-zinc-200">
                                         <button
                                             onClick={() => toggleExpand(answer.id)}
-                                            className="flex items-center gap-1.5 text-[10px] text-white/40 hover:text-white transition"
+                                            className="flex items-center gap-1.5 text-[10px] text-zinc-400 hover:text-zinc-800 transition font-semibold"
                                         >
                                             {isExpanded ? (
                                                 <>
@@ -206,7 +209,7 @@ export default function DemoStepResults({ sessionId, onNext }: DemoStepResultsPr
                                             )}
                                         </button>
                                         {isExpanded && (
-                                            <p className="mt-2 text-[10px] text-white/60 leading-relaxed bg-black/30 border border-white/[0.04] p-3 rounded-lg max-h-32 overflow-y-auto whitespace-pre-wrap">
+                                            <p className="mt-2 text-[10px] text-zinc-600 leading-relaxed bg-white border border-zinc-200 p-3 rounded-lg max-h-32 overflow-y-auto whitespace-pre-wrap font-mono">
                                                 {answer.raw_text}
                                             </p>
                                         )}
@@ -218,10 +221,10 @@ export default function DemoStepResults({ sessionId, onNext }: DemoStepResultsPr
                 </div>
             ))}
 
-            <div className="flex justify-end">
+            <div className="flex justify-end pt-4">
                 <button
                     onClick={onNext}
-                    className="flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-xs font-semibold text-black transition hover:bg-white/90 hover:scale-[1.01]"
+                    className="flex items-center gap-2 rounded-xl bg-zinc-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-zinc-800 hover:scale-[1.01]"
                 >
                     Next: View Analytics
                     <ArrowRight className="h-4 w-4" />
