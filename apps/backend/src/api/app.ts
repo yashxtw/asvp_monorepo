@@ -18,6 +18,7 @@ import feedbackRoutes from "../routes/feedback";
 import noAccessRoutes from "../routes/noAccessRoutes";
 import dashboardRoute from "../routes/dashboard"
 import webhookRoutes from "../routes/billing-webhook";
+import demoRoute from "../routes/demo";
 
 import { apiLimiter } from "../middleware/rateLimit";
 import { requireAuth } from "../middleware/requireAuth";
@@ -70,5 +71,6 @@ export const createApp = () => {
     app.use("/feedback", feedbackRoutes);
     app.use("/no-access", noAccessRoutes);
     app.use("/dashboard", apiLimiter, requireAuth, dashboardRoute); 
+    app.use("/demo", apiLimiter, demoRoute);
     return app;
 };

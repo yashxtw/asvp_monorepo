@@ -26,7 +26,7 @@ export default function Header() {
     const router = useRouter();
     return (
         <header className="w-full fixed top-0 z-50 px-6 md:px-20 pt-2">
-            <div className="mx-auto rounded-2xl backdrop-blur-sm max-w-7xl px-2 py-2 flex items-center justify-between">
+            <div className="mx-auto rounded-2xl backdrop-blur-sm max-w-7xl px-2 md:px-4 py-2 flex items-center justify-between bg-black/30">
 
                 <Link href="/" className="flex items-center gap-2">
                     <div className="h-10 w-10 flex items-center justify-center">

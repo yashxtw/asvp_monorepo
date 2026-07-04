@@ -17,7 +17,7 @@ export default function Hero() {
         <section className="relative min-h-screen w-full overflow-hidden">
             {/* ── Background image ── */}
             <Image
-                src="/hero.jpg"
+                src="/hero3.jpg"
                 alt="Hero background"
                 fill
                 priority
@@ -25,10 +25,10 @@ export default function Hero() {
             />
 
             {/* ── Gradient overlays ── */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/50" />
+            <div className="absolute inset-0 bg-gradient-to-t from-transparent via-transparent to-black/50" />
             <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-transparent" />
             {/* Bottom fade to solid black — merges with DashboardPreview */}
-            <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-b from-transparent to-black" />
+            {/* <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-b from-transparent to-white" /> */}
 
             {/* ── Content (same as original, overlaid on image) ── */}
             <div className="relative z-10 max-w-6xl mx-auto px-6 pt-28 pb-16 text-center min-h-screen flex flex-col justify-center">
@@ -50,7 +50,7 @@ export default function Hero() {
                     your brand needs to be part of the answer.
                 </h1>
 
-                <p className="mt-8 max-w-3xl mx-auto text-lg sm:text-xl text-white/70 leading-relaxed">
+                <p className="mt-8 max-w-3xl mx-auto text-lg sm:text-xl text-black/80 leading-relaxed">
                     VerityAI shows how AI systems describe your brand, where competitors win, and what to improve next.
                 </p>
 
@@ -58,7 +58,7 @@ export default function Hero() {
                     {highlights.map((item) => (
                         <div
                             key={item}
-                            className="rounded-2xl border-t border-white/20 shadow-sm bg-white/10 backdrop-blur-md px-4 py-3 text-sm text-white/80"
+                            className="rounded-2xl border-t border-white/20 shadow-sm bg-white/10 backdrop-blur-md px-4 py-3 text-sm text-black/80"
                         >
                             {item}
                         </div>
@@ -74,10 +74,8 @@ export default function Hero() {
                     </button>
 
                     <button
-                        onClick={() =>
-                            document.getElementById("how-it-works")?.scrollIntoView({ behavior: "smooth" })
-                        }
-                        className="rounded-xl border border-white/40 px-4 py-2 font-semibold text-white transition-all duration-300 hover:border-white/70 hover:bg-white/10"
+                        onClick={() => router.push("/demo")}
+                        className="rounded-xl border border-white/40 px-4 py-2 font-semibold text-white transition-all duration-300 hover:border-white/70 hover:bg-black bg-black/80"
                     >
                         See how it works
                     </button>

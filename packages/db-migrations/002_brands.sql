@@ -11,6 +11,6 @@ CREATE INDEX IF NOT EXISTS idx_brands_customer_id ON brands(customer_id);
 CREATE UNIQUE INDEX IF NOT EXISTS uq_customer_brand ON brands(customer_id, brand_name);
 
 ALTER TABLE brands 
-ADD COLUMN description TEXT,
-ADD COLUMN logo_url TEXT,
-ADD COLUMN competitors TEXT[] default '{}';
+ADD COLUMN IF NOT EXISTS description TEXT,
+ADD COLUMN IF NOT EXISTS logo_url TEXT,
+ADD COLUMN IF NOT EXISTS competitors TEXT[] default '{}';
